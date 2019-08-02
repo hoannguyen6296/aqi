@@ -1,0 +1,10 @@
+{"certDir":"/home/pi/rasp_ver/SensorToCloud/example/iot-gateway/cloudAdapter/certs/",
+"clientId":"AQI_Test",
+"region":"ap-southeast-1",
+"port":8883,
+"host":"a3ts2s3739x2e8-ats.iot.ap-southeast-1.amazonaws.com",
+"debug":false,
+"keyPath":"a2667cb021-private.pem.key",
+"certPath":"a2667cb021-certificate.pem.crt",
+"caPath":"root-CA.crt"
+}

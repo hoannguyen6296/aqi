@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\iot-gateway",
+    "\\iot-gateway\\appClient",
+    "\\iot-gateway\\appClient\\avgData",
+    "\\iot-gateway\\appClient\\devices",
+    "\\iot-gateway\\appClient\\nwkinfo"
+  ],
+  "SelectedNode": "\\iot-gateway\\appClient\\appclient.js",
+  "PreviewInSolutionExplorer": false
+}

@@ -1,0 +1,10 @@
+applications:
+- path: .
+  memory: 256M
+  instances: 1
+  domain: mybluemix.net
+  name: s2c-linux
+  host: s2c-linux
+  disk_quota: 1024M
+  services:
+  - Internet of Things Platform-s2c-linux

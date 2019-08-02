@@ -1,0 +1,7 @@
+cd /usr/share/wl18xx
+./load_wlcore.sh  > /dev/null
+sleep 2
+./sta_start.sh  > /dev/null
+cd - > /dev/null
+sleep 2
+wpa_cli -iwlan0 scan

@@ -1,0 +1,24 @@
+{
+  "name": "commissioner",
+  "version": "1.0.0",
+  "description": "This application is used to configure the BeagleBone Black as a gateway and connect to the Cloud.",
+  "main": "commissioner.js",
+  "private": "true",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node commissioner.js"
+  },
+  "author": "Brock Allen",
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "express": "^4.13.4",
+    "formidable": "*",
+    "events": "*",
+    "socket.io": "^1.4.5",
+    "http": "*",
+    "os": "*",
+    "path": "*",
+    "fs": "*"
+
+  }
+}

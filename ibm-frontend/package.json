@@ -1,0 +1,24 @@
+{
+  "name": "s2c-linux",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "3.2.6",
+    "angular": "1.6.1",
+    "cfenv": "1.0.x",
+    "ibmiotf":"~0.2.11",
+    "when": "~3.x",
+    "nano": "~5.11.0",
+    "socket.io": "x.x.x",
+    "feedparser":"~0.19.2",
+    "util": "*"
+  },
+  "repository": {},
+  "engines": {
+  "node": "4.x"
+  }
+
+}

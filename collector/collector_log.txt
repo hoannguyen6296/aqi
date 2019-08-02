@@ -1,0 +1,10 @@
+   0.037: Collector_updateFwList: new oad file: ../../firmware/oad/sensor_oad_cc13x0lp_app.bin
+   0.037: Collector_updateFwList: Added ../../firmware/oad/sensor_oad_cc13x0lp_app.bin, ID 0
+   0.049: Found Mac Co-Processor Version info is:
+   0.049: Transport: 3
+   0.049:   Product: 1
+   0.049:     Major: 2
+   0.049:     Minor: 0
+   0.049:     Maint: 1
+  32.102: ERROR: server-rd: Interface dead, rawhandle: 5
+  32.102: ERROR: s2u-0-iface: rx-thread dead

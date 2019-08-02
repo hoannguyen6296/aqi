@@ -1,0 +1,12 @@
+[Unit]
+Description=Autostart WiFi
+After=syslog.target network.target
+
+[Service]
+Type=forking
+User=root
+ExecStart=/bin/sh autostart.sh
+WorkingDirectory=/home/root/linux_s2c/example/commissioner/
+
+[Install]
+WantedBy=multi-user.target

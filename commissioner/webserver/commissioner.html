@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+/******************************************************************************
+
+ @file collectorApp.html
+
+ @brief front end file
+
+ Group: WCS LPC
+ $Target Devices: Linux: AM335x, Embedded Devices: CC1310, CC1350$
+
+ ******************************************************************************
+ $License: BSD3 2016 $
+
+   Copyright (c) 2015, Texas Instruments Incorporated
+   All rights reserved.
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions
+   are met:
+
+   *  Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+   *  Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+
+   *  Neither the name of Texas Instruments Incorporated nor the names of
+      its contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+   THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+   PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+   OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+   WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+   EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ******************************************************************************
+ $Release Name: TI-15.4Stack Linux x64 SDK ENG$
+ $Release Date: Mar 08, 2017 (2.01.00.10)$
+ *****************************************************************************/
+ -->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other
+    head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="Brock Allen">
+    <title>Sensor-To-Cloud Setup</title>
+    <!-- Bootstrap core CSS -->
+    <link href="dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+    .panel-default > .panel-heading-custom {
+        background: #ff0000;
+        color: #fff;
+    }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-brand" style="background: #ff0000; color: #fff;">
+        <a href="/">
+            <p><img src="dist/images/TI_logo.png" style="max-width: 30px; margin-top: -7px;" ></a> Texas Instruments Sensor-To-Cloud</p>
+        </div>
+    </nav>
+    <br>
+    <br>
+    <br>
+    <br>
+    <div class="container">
+        <div class="panel-group">
+            <div id="connectionStatusPanel" class="panel panel-default" style="display:none">
+                <div class="panel-heading panel-heading-custom">
+                    Network Connection Status
+                </div>
+                <div class="panel-body row">
+                    <div id="connectionStatus" class="col-sm-6" style="float: left">
+                        Please wait...
+                    </div>
+                    <div class="col-sm-6">
+                    <div class="btn-group-vertical" style="float: right; al">
+                        <button class="btn btn-default" onclick="showConnect(this)">Connect to Network<span class="glyphicon glyphicon-triangle-bottom"></span></button>
+                        <button class="btn btn-default" onclick="showConfigCollector(this)">Configure Collector<span class="glyphicon glyphicon-triangle-bottom"></span></button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div id="networkConfigDialog3" class="panel panel-default" style="display:none">
+                <div class="panel-heading panel-heading-custom">Connecting to Wi-Fi.</div>
+                <div id="cloudConnectivityInfo3" class="panel-body">Please wait...</div>
+            </div>
+            <div id="networkConnectSuccess" class="panel panel-default" style="display:none">
+                <div class="panel-heading panel-heading-custom">Connected Successfully!</div>
+                <div id="ipAddrPanel" class="panel-body">Obtaining IP Address</div>
+            </div>
+            <!-- welcome screen -->
+            <div id="welcomePanel" class="panel panel-default">
+                <div class="panel-heading panel-heading-custom">Welcome To Sensor-To-Cloud</div>
+                <div class="panel-body">
+                Thank you for purchasing the SimpleLink Sub-1 GHz Sensor to Cloud Industrial Gateway development kit.<br><br>
+                This web application will lead you through the process of setting up and deploying a cloud connected Sub1-GHz gateway. The first step is to select how you would like to host your gateway, locally, or via our supported cloud service providers. If you select to host your gateway on the cloud, you will be prompted to connect to the internet. It is not required to be connected to the internet to host your gateway locally. Once connected to the internet you can select your cloud provider of choice, but note that only the IBM Quickstart option wil work without any cloud setup. The status bar at the top will show what network you are connected to, the IP address of the BeagleBone if you wish to connect via your home network (port 1310), and if there is a gateway currently running. There is also the option to customize various Sub1-GHz network parameters, but many of these options will require changes to the sensor node firmware. We hope this application gives you an idea of how easy it is to control your network from the cloud.<br><br>
+                For more information please refer to the Quick-Start Guide included with this software.
+
+                    <button type="button" class="btn btn-default" id="startCommissioing" onclick="startCommissioingClicked()" style="float:right;">Lets GO!</button>
+                </div>
+            </div>
+            <!-- Select the option to run the demo -->
+            <div id="networkConfigDialog2" class="panel panel-default" style="display:none">
+                <div class="panel-heading panel-heading-custom">Step 1 - Select how you want to host your gateway</div>
+                <div class="panel-body">
+                    <div class="btn-group-horizantal">
+                        <button type="button" class="btn btn-default" id="commForCloudConnectedGateway" onclick="commForCloudConnectedGateway()" style="text-align:left">Cloud Gateway</button>
+                        <button type="button" class="btn btn-default" id="commForLocalGatewayWCloud" onclick="launchLocalGateway(this)" style="float:right">Local Gateway</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Connect to the internet -->
+            <div id="connectToInternet" class="panel panel-default" style="display:none">
+                <div class="panel-heading panel-heading-custom">Step 2 - Connect to the internet</div>
+                <div class="panel-body">
+                    Lets connect the gateway to the Internet via Wi-Fi so it can talk to the cloud. First scan for your Wi-Fi network.
+                </div>
+                <div class="form-group form-inline">
+                    <div id="availableNetworksTable">
+                        <label for="selectNetworksList" class="col-sm-2 input-group-lg">SSID:</label>
+                        <div id="selectNetworksDiv">
+                            <select id='selectNetworksList' onclick='showAvailableNetworks()' class="form-control" style="width:auto">
+                                <option selected value="">Click here to scan for available networks</option>
+                            </select>
+                        </div>
+                    </div>
+                    <br>
+                    <label for="networkKey" class="col-sm-2">Network Key:</label>
+                    <input id="networkKey" type="password" name="networkKey">
+                    <br>
+                    <br>
+                    <label class="col-sm-4">
+                        <input id="networkCheckbox" type="checkbox" name="rememberNetwork" value="true" checked>Remember Network</label>
+                    <br>
+                    <br>
+                    <button type=button class="btn btn-default" disabled id="connectToNetwork" onclick="connectToNetworkClicked()">connect</button>
+                </div>
+            </div>
+            <!-- Configure Collector Application -->
+            <div id="collectorConfigPanel" class="panel panel-default" style="display:none">
+                <div class="panel-heading panel-heading-custom">Configure TI 15.4-Stack Network Parameters</div>
+                <div class="panel-body">
+                    <p>You can change various network parameters here. Saving these setting will reset stored network info. If a field submited empty, then the default value will be set.</p>
+                    <form action="/config" method="post" id="configForm">
+                    <legend>Network Configurations</legend>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="channel">Channel</label>
+                            <div class="col-sm-10">
+                                <input type="number" class="form-control" id="channel" placeholder="0" name="channel">
+                                <small id="channelHelp" class="form-text text-muted">Select channel. (0-127 for 915MHz), (0-33 for 868MHz), and (0-7 for 433 MHz)</small>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="PanID">PAN ID</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="panID" placeholder="ACDC" name="panID" pattern="[a-fA-F\d]{4}">
+                                <small id="panHelp" class="form-text text-muted">Unique 4 digit hexidecimal network identifier</small>
+                            </div>
+                        </div>
+                        <legend>Sensor Configurations</legend>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="reportInterval">Reporting Interval</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="reportInterval" placeholder="10000" name="reportInterval" pattern="[\d]+">
+                                <small id="reportHelp" class="form-text text-muted">Time interval between sensor reports in milliseconds.</small>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-2" for="pollInterval">Polling Interval</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="pollInterval" placeholder="6000" name="pollInterval" pattern="[\d]+">
+                                <small id="pollHelp" class="form-text text-muted">Time interval for a sensor to receive a message in milliseconds.</small>
+                            </div>
+                        </div>
+                        <div class="row">
+                        <div class="form-group col-sm-6">
+                            <legend>Frequency Band</legend>
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input type="radio" class="form-check-input" name="frequencyRadios" id="frequencyRadios1" value=1 checked> 915 MHz - FCC
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input type="radio" class="form-check-input" name="frequencyRadios" id="frequencyRadios2" value=3> 868 MHz - ETSI
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input type="radio" class="form-check-input" name="frequencyRadios" id="frequencyRadios3" value=128> 433 MHz - China
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-6">
+                            <legend>Data Rate</legend>
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input type="radio" class="form-check-input" name="dataRateRadios" id="dataRateRadios1" value=50 checked> 50 kbps
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <label class="form-check-label">
+                                    <input type="radio" class="form-check-input" name="dataRateRadios" id="dataRateRadios2" value=5> 5 kbps
+                                </label>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="loadNVCheckbox" name="nvRestore" value="true" checked>
+                            <label class="form-check-label">NV Restore</label>
+                            <div><small class="form-text text-muted">Restore network at launch</small></div>
+                        </div>
+                        <br>
+                        <button type="button" class="btn btn-default" onclick="runScript('eraseNV.sh');alert('Remeber to clear each sensor\'s NV by holding BTN-2 and pressing RESET');" style="float:right; color:red">Reset Without Saving</button>
+                        <button type="submit" class="btn btn-default" style="float:left; color:blue">Save and Reset</button>
+                </form>
+            </div>
+            </div>
+            <!-- Select the cloud service -->
+            <div id="cloudSelect" class="panel panel-default" style="display:none">
+                <div class="panel-heading panel-heading-custom">Step 3 - Select the desired Cloud Service</div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <img src="dist/images/aws.png">
+                            <button id="awsButton" onclick="awsCloudSelected()" class="btn btn-default">&nbsp;AWS</button>
+                            <br>
+                            <img src="dist/images/ibm.png" width="50" height="50">
+                            <button id="ibmButton" onclick="ibmCloudSelected()" class="btn btn-default">IBM</button>
+                            <br>
+                            <img src="dist/images/quickstart.jpg" width="50" height="50">
+                            <button type='button' class="btn btn-default" onclick="socket.emit('launchGateway','quickstart');this.innerHTML='Please wait...'; this.disabled=true;">IBM Quickstart</button>
+                            <br>
+                            <img src="dist/images/bbb.png" width="50" height="50">
+                            <button id="localButton" onclick="launchLocalGateway(this)" class="btn btn-default">Local Gateway</button>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </nbsp>
+            <!-- Configure for the AWS Cloud and start the gateway -->
+            <div id="configForAws" class="panel panel-default" style="display:none">
+                <div class="panel-heading panel-heading-custom">AWS: Configure Security Information</div>
+                <div class="panel-body">
+                    <div class="col-sm-6">
+                        <p>
+                            Upload the security files recieved via StackArmor or your personal AWS console to gateway needed to access the cloud.
+                            <br> If you dont have the keys please contact stackArmor at this URL: https://www.stackarmor.com/iotdemo/
+                        </p>
+                        <form action="/" enctype="multipart/form-data" method="post" id="awsUploadForm">
+                            <div class="form-group">
+                                <label for="privateKey">private.pem.key</label>
+                                <input type="file" name="private key" class="form-control" id="privateKey">
+                            </div>
+                            <div class="form-group">
+                                <label for="publicKey">public.pem.key</label>
+                                <input type="file" name="public key" class="form-control" id="publicKey">
+                            </div>
+                            <div class="form-group">
+                                <label for="certificate">certificate.pem.crt</label>
+                                <input type="file" name="certificate" class="form-control" id="certificate">
+                            </div>
+                            <div class="form-group">
+                                <label for="root-ca">root-CA.crt</label>
+                                <input type="file" name="root certificate" class="form-control" id="root-ca">
+                            </div>
+                            <br>
+                            <input type="submit" class="btn btn-default">
+                            <button id="uploadReset" type="button" onclick="runScript('removeUploads.sh'); var x=$('#launchAwsButton');x.prop('disabled','true');x.css('color','black');" class="btn btn-default" style="float:right">Reset Uploads</button>
+                        </form>
+                        <br>
+                        <p id="uploadedFilesList">Uploaded files: (none)</p>
+                        <button id="launchAwsButton" onclick="launchAWSGateway(this)" type="button" class="btn btn-default" style="float:right" disabled>Start AWS Gateway</button>
+                        <br>
+                    </div>
+                </div>
+            </div>
+            <!-- Configure for the IBM Cloud and start the gateway -->
+            <div id="configForIbm" class="panel panel-default" style="display:none">
+                <div class="panel-heading panel-heading-custom">IBM: Configure Cloud Parameters</div>
+                <div class="panel-body">
+                    <div class="col-sm-6">
+                        <p> The first step is to set your IBM account and host the cloud application provided with Sensor-To-Cloud. For more information on this process see the included documentation.
+                            <br> Next configure the gateway information when setting up the front end
+                            <br> Note: This includes 4 parameters:
+                            <i>gatewayid</i>, <i>orgid</i>, <i>device type</i>, and <i>authentication token</i>.
+                        </p>
+                        <form class="form-horizontal" id="ibmConfigForm" action="/">
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="param1">Org</label>
+                                <div class="col-sm-10">
+                                    <input type="param1" class="form-control" id="param1" placeholder="Enter org" name="org">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="param2">Type</label>
+                                <div class="col-sm-10">
+                                    <input type="param2" class="form-control" id="param2" placeholder="Enter device type" name="type">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="param3">ID</label>
+                                <div class="col-sm-10">
+                                    <input type="param3" class="form-control" id="param3" placeholder="Enter device id" name="id">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-2" for="param4">Token</label>
+                                <div class="col-sm-10">
+                                    <input type="param4" class="form-control" id="param4" placeholder="Enter auth-token" name="auth-token">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-default" onclick="socket.emit('launchGateway','ibm')">Start with last config</button>
+                            <button type="submit" class="btn btn-default" style="float: right;">Start IBM Gateway</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            </div>
+            </div>
+            <!-- Bootstrap core JavaScript
+    ================================================== -->
+            <!-- Placed at the end of the document so the pages load faster -->
+            <script src="/dist/jquery/jquery-1.12.0.min.js"></script>
+            <script>
+            window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')
+            </script>
+            <script src="dist/js/bootstrap.min.js"></script>
+            <script src="/socket.io/socket.io.js"></script>
+            <script>
+            var socket = io.connect();
+
+            connectedtoInternet = false;
+
+            internetDialogShown = false;
+
+            collectorDialogShown = false;
+
+            function rssiToBar(rssi) {
+                if (rssi > -30) return "████ ";
+                if (rssi > -50) return "███ ";
+                if (rssi > -70) return "██ ";
+                if (rssi > -90) return "█ ";
+                return " ";
+            }
+
+            socket.on('uploadedFiles', function(data) {
+                var uploaded_files = JSON.parse(data);
+                console.log("uploadedFiles:" + uploaded_files);
+                document.getElementById('uploadedFilesList').innerHTML = "Uploaded files: " + uploaded_files;
+                if (uploaded_files.length >= 4) {
+                    let but = $('#launchAwsButton');
+                    but.prop('disabled', false);
+                    but.css('color', 'green');
+                }
+            });
+
+            socket.on("connectionStatus", function(data) {
+                //conn = JSON.parse(data);
+                console.log("Conection Status: ");
+                console.log(data);
+                connectedtoInternet = data.connected;
+                if (connectedtoInternet) {
+                    $('#connectionStatus').html("<span class='glyphicon glyphicon-signal text-success'></span> " + data.ssid + "<br>IP: " + data.ipAddr + "<br>Gateway: " + data.gateway);
+                } else {
+                    $('#connectionStatus').html("No Internet Connection.<br>Gateway: " + data.gateway);
+                }
+            });
+
+
+            socket.on('StationIpAddr2', function(data) {
+                console.log("recieved StationIpAddr2 message from the web server, network address = " + data.ipAddr);
+                //document.getElementById('cloudConnectivityInfo3').innerHTML = "Allocated IP address: " + data.ipAddr;
+                document.getElementById('ipAddrPanel').innerHTML = "Allocated IP address: " + data.ipAddr;
+                //document.getElementById('networkConfigDialog4').style.display = 'block';
+                // document.getElementById('networkConfigDialog3').style.display = 'none';
+                //document.getElementById('networkConnectSuccess').style.display = 'block';
+                // document.getElementById('cloudSelect').style.display = 'block';
+                showCloudSelect();
+            });
+
+            /* display the list of available networks*/
+            socket.on('availableNetworks', function(data) {
+                console.log("data = " + data);
+                var availableNetworks = JSON.parse(data);
+                console.log("recieved availableNetworks message from the web server. data = " + availableNetworks[0].ssid);
+
+                var html = "<select id='selectNetworksList' onchange='networkSelected(this.value)' class='form-control' style='width:auto'>";
+                html += '<option selected value="">(Please select a network)</option>'
+                html += '<option value="REFRESH_LIST">Click here to refresh</option>';
+                for (var i = 0; i < availableNetworks.length; i++) {
+                    html += "<option value='" + availableNetworks[i].ssid + "'>" + rssiToBar(availableNetworks[i].signalLevel) + " " + availableNetworks[i].ssid + "</option>";
+                }
+                html += "</select>";
+                document.getElementById("selectNetworksDiv").innerHTML = html;
+            });
+
+            socket.on('awsUrl', function(data) {
+                let url = "http://" + data;
+                console.log(url);
+                //alert("AWS StackArmor URL is\n"+data+"\nPlease save this url. You can connect to the cloud and manage your sensor network via this url from any internet connected browser!");
+                window.location.assign(url);
+            });
+
+            socket.on("alert", function(str){
+                alert(str);
+            });
+
+            socket.on('quickstartUrl', function(data) {
+                console.log(data);
+                window.location.assign(data);
+            });
+
+            socket.on("localRedirect", function(port) {
+                console.log("local gateway running on port",port);
+                window.location.port = port;
+            })
+
+            /* close connection */
+            $(window).on('beforeunload', function() {
+                socket.close();
+            });
+
+            function showAvailableNetworks() {
+                var html = "<select  id='selectNetworksList' onchange='networkSelected(this.value)' class='form-control' style='width:auto'>";
+                html += '<option selected value="">Please wait while refreshing list...    </option>'
+                html += "</select>";
+                document.getElementById("selectNetworksDiv").innerHTML = html;
+
+                socket.emit('wifiConfig', {
+                    action: "startConfig"
+                });
+            }
+
+            function networkSelected(ssid) {
+                console.log("selected network ssid = " + ssid);
+                if (ssid == "REFRESH_LIST") {
+                    document.getElementById("connectToNetwork").disabled = true;
+                    showAvailableNetworks();
+                } else if (ssid == "") {
+                    document.getElementById("connectToNetwork").disabled = true;
+                } else {
+                    document.getElementById("networkKey").focus();
+                    document.getElementById("connectToNetwork").disabled = false;
+                }
+            }
+
+            function connectToNetworkClicked() {
+                console.log(document.getElementById("selectNetworksList").value);
+                console.log(document.getElementById("networkKey").value);
+                socket.emit('connectToThisNetwork', '{ "ssid": "' + document.getElementById("selectNetworksList").value + '" , "key": "' + document.getElementById("networkKey").value + '", "remember": "' + document.getElementById("networkCheckbox").checked + '"}');
+                console.log('{ "ssid": "' + document.getElementById("selectNetworksList").value + '" , "key": "' + document.getElementById("networkKey").value + '", "remember": "' + document.getElementById("networkCheckbox").checked + '"}');
+                showCloudConnectivity();
+                //document.getElementById('networkConfigDialog').style.display = 'none';
+                document.getElementById('networkConfigDialog2').style.display = 'none';
+                document.getElementById('welcomePanel').style.display = 'none';
+                document.getElementById('networkConfigDialog3').style.display = 'block';
+            }
+
+            function showCloudConnectivity() {
+                if (document.getElementById('networkConfigDialog2').style.display == 'block') {
+                    document.getElementById('networkConfigDialog2').style.display = 'none';
+                    //document.getElementById('cloudConnectivityInfo').innerHTML = "*** For cloud connectivity, please click here ***";
+                } else {
+                    document.getElementById('networkConfigDialog2').style.display = 'block';
+                    //document.getElementById('cloudConnectivityInfo').innerHTML = "*** To hide this section, please click here ***";
+                }
+
+            }
+
+            function launchAWSGateway(btn) {
+                console.log("Launching AWS Gateway!");
+                socket.emit('launchGateway', 'aws');
+                btn.innerHTML = "Please wait..."
+                btn.disabled = true;
+            }
+
+            /* Hide everything at startup except welcome screen*/
+            function startUpDisplay() {
+                document.getElementById('welcomePanel').style.display = 'block';
+                document.getElementById('networkConfigDialog2').style.display = 'none';
+                document.getElementById('networkConfigDialog3').style.display = 'none';
+                document.getElementById('cloudSelect').style.display = 'none';
+                document.getElementById('connectToInternet').style.display = 'none';
+                document.getElementById('networkConnectSuccess').style.display = 'none';
+                document.getElementById('configForAws').style.display = 'none';
+                document.getElementById('configForIbm').style.display = 'none';
+                document.getElementById('connectionStatusPanel').style.display = 'none';
+                document.getElementById('collectorConfigPanel').style.display = 'none';
+            }
+
+            /* start the display */
+            startUpDisplay();
+
+            /* start Commissioining window */
+            function startCommissioingClicked() {
+                document.getElementById('welcomePanel').style.display = 'none';
+                document.getElementById('networkConfigDialog2').style.display = 'block';
+                document.getElementById('networkConfigDialog3').style.display = 'none';
+                document.getElementById('cloudSelect').style.display = 'none';
+                document.getElementById('connectToInternet').style.display = 'none';
+                document.getElementById('networkConnectSuccess').style.display = 'none';
+                document.getElementById('configForAws').style.display = 'none';
+                document.getElementById('configForIbm').style.display = 'none';
+                document.getElementById('connectionStatusPanel').style.display = 'block';
+            }
+
+            /* connect to the Internet window */
+            function commForCloudConnectedGateway() {
+                if (!connectedtoInternet) {
+                    document.getElementById('welcomePanel').style.display = 'none';
+                    document.getElementById('networkConfigDialog2').style.display = '   none';
+                    document.getElementById('networkConfigDialog3').style.display = '   none';
+                    document.getElementById('cloudSelect').style.display = 'none';
+                    document.getElementById('connectToInternet').style.display = '  block';
+                    document.getElementById('networkConnectSuccess').style.display = 'none';
+                    document.getElementById('configForAws').style.display = 'none';
+                    document.getElementById('configForIbm').style.display = 'none';
+                } else {
+                    showCloudSelect();
+                }
+            }
+
+            /* Cloud select */
+            function showCloudSelect() {
+                console.log("select the cloud service");
+                document.getElementById('welcomePanel').style.display = 'none';
+                document.getElementById('networkConfigDialog2').style.display = 'none';
+                document.getElementById('networkConfigDialog3').style.display = 'none';
+                document.getElementById('cloudSelect').style.display = 'block';
+                document.getElementById('connectToInternet').style.display = 'none';
+                document.getElementById('configForAws').style.display = 'none';
+                document.getElementById('configForIbm').style.display = 'none';
+            }
+
+            /* Launch Local Gateway */
+            function launchLocalGateway(btn) {
+                console.log("Launching local Gateway!");
+                socket.emit('launchGateway', 'localhost');
+                btn.innerHTML = "Please wait...";
+            }
+
+            /* AWS cloud selected - let do the configuration and launch*/
+            function awsCloudSelected() {
+                console.log("aws Cloud Selected");
+                document.getElementById('welcomePanel').style.display = 'none';
+                document.getElementById('networkConfigDialog2').style.display = 'none';
+                document.getElementById('networkConfigDialog3').style.display = 'none';
+                document.getElementById('cloudSelect').style.display = 'none';
+                document.getElementById('connectToInternet').style.display = 'none';
+                document.getElementById('networkConnectSuccess').style.display = 'none';
+                document.getElementById('configForAws').style.display = 'block';
+                document.getElementById('configForIbm').style.display = 'none';
+            }
+
+            /* IBM cloud selected - let do the configuration and launch*/
+            function ibmCloudSelected() {
+                console.log("IBM Cloud Selected");
+                document.getElementById('welcomePanel').style.display = 'none';
+                document.getElementById('networkConfigDialog2').style.display = 'none';
+                document.getElementById('networkConfigDialog3').style.display = 'none';
+                document.getElementById('cloudSelect').style.display = 'none';
+                document.getElementById('connectToInternet').style.display = 'none';
+                document.getElementById('networkConnectSuccess').style.display = 'none';
+                document.getElementById('configForAws').style.display = 'none';
+                document.getElementById('configForIbm').style.display = 'block';
+            }
+
+            /* Reset uploads */
+            function resetUploads() {
+                console.log("Deleting uploads contencts");
+                socket.emit("resetUploads");
+            }
+
+            function runScript(script) {
+                console.log("running " + script);
+                socket.emit("runScript", script);
+            }
+
+            function showConnect(btn) {
+                if (internetDialogShown === false) {
+                    let html = 'Hide connection panel<span class="glyphicon glyphicon-triangle-top"></span>'
+                    btn.innerHTML = html;
+                    document.getElementById('connectToInternet').style.display = 'block';
+                    internetDialogShown = true;
+                } else {
+                    let html = 'Connect to network<span class="glyphicon glyphicon-triangle-bottom"></span>'
+                    btn.innerHTML = html;
+                    document.getElementById('connectToInternet').style.display = 'none';
+                    internetDialogShown = false;
+                }
+            }
+
+            function showConfigCollector(btn) {
+                if (collectorDialogShown === false) {
+                    let html = 'Hide configuration panel<span class="glyphicon glyphicon-triangle-top"></span>'
+                    btn.innerHTML = html;
+                    document.getElementById('collectorConfigPanel').style.display = 'block';
+                    collectorDialogShown = true;
+                } else {
+                    let html = 'Configure Collector<span class="glyphicon glyphicon-triangle-bottom"></span>'
+                    btn.innerHTML = html;
+                    document.getElementById('collectorConfigPanel').style.display = 'none';
+                    collectorDialogShown = false;
+                }
+            }
+
+            $('#awsUploadForm').submit(function(event) {
+                event.preventDefault();
+                $.ajax({
+                    url: '/',
+                    type: 'POST',
+                    data: new FormData(this),
+                    processData: false,
+                    contentType: false,
+                    success: function(res, status, jqXHR) {
+                        console.log(res);
+                        if (res['files']) {
+                            document.getElementById('uploadedFilesList').innerHTML = "Uploaded files: " + res['files'];
+                            $('#launchAwsButton').prop('disabled', false);
+                            $('#launchAwsButton').css('color', 'green');
+                        }
+                    }
+                });
+            });
+
+            $('#configForm').submit(function(event) {
+                event.preventDefault();
+                var configForm = $(this).serializeArray();
+                console.log(configForm);
+                socket.emit("configCollector",configForm);
+                alert("Remember to reset sensor devices!");
+            });
+
+            $('#ibmConfigForm').submit(function(event) {
+                event.preventDefault();
+                var formInfo = $(this).serializeArray();
+                console.log(formInfo);
+                socket.emit("launchIBMGateway", formInfo);
+                alert("Gateway has started. Connect to internet to access the cloud front end, using your Bluemix App URL.");
+            });
+            </script>
+</body>
+
+</html>

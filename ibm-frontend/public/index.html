@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+/******************************************************************************
+
+@file collectorApp.html
+
+@brief front end file
+
+Group: WCS LPC
+$Target Device: DEVICES $
+
+******************************************************************************
+$License: BSD3 2016 $
+******************************************************************************
+$Release Name: PACKAGE NAME $
+$Release Date: PACKAGE RELEASE DATE $
+*****************************************************************************/
+-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other
+    head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="Suyash Jain">
+
+    <title>Sensor-To-Cloud IBM Gateway</title>
+    <!-- Bootstrap core CSS -->
+    <link href="dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="dist/js/bootstrap.min.js"></script>
+
+    <style>
+        /* Sets the device information block to scroll after
+           set height */
+        #ConnectedDeviceWrapper {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        /* set alignment for table elements */
+        .table > tbody > tr > td {
+            vertical-align: middle;
+        }
+    </style>
+
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">TI 15.4-Stack Sensor-To-Cloud IBM Gateway</a>
+          <ul class="nav navbar-nav navbar-right">
+            <!-- Button trigger modal -->
+            <li><a class=" glyphicon glyphicon-cog" data-toggle="modal" data-target="#myModalNorm"></a></li>
+        </ul>
+        </div>
+
+    </nav>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModalNorm" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <button type="button" class="close"
+                       data-dismiss="modal">
+                           <span aria-hidden="true">&times;</span>
+                           <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        IBM IoT Credentials
+                    </h4>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+
+                    <form role="form">
+                    <div class="form-group">
+                        <label for="ServiceName">Service Name</label>
+                          <input type="text" class="form-control"
+                              id="ServiceName" placeholder="Enter Service Name"/>
+                      </div>
+                      <div class="form-group">
+                        <label for="Id">ID</label>
+                          <input type="text" class="form-control"
+                              id="Id" placeholder="Enter iot Credentials Identifier"/>
+                      </div>
+                      <div class="form-group">
+                        <label for="Org">Org</label>
+                          <input type="text" class="form-control"
+                          id="Org" placeholder="Enter org"/>
+                      </div>
+                      <div class="form-group">
+                        <label for="ApiKey">API Key</label>
+                          <input type="text" class="form-control"
+                              id="ApiKey" placeholder="Enter api Key"/>
+                      </div>
+                      <div class="form-group">
+                        <label for="ApiToken">API Token</label>
+                          <input type="text" class="form-control"
+                              id="ApiToken" placeholder="Enter api Token"/>
+                      </div>
+                      <div class="form-group">
+                        <label for="type">Device Type</label>
+                          <input type="text" class="form-control"
+                              id="type" placeholder="Enter Device Type"/>
+                      </div>
+                      <div class="form-group">
+                        <label for="typeId">Device ID</label>
+                          <input type="text" class="form-control"
+                              id="typeId" placeholder="Enter Device Id"/>
+                      </div>
+
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <input id="changeBtn" type="button" class="btn btn-primary" value = "Save changes" data-dismiss="modal"/>
+                      </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Main jumbotron -->
+    <div class="jumbotron">
+        <div class="container">
+            <h2>TI 15.4-Stack Linux Gateway Example Application</h2>
+        </div>
+    </div>
+
+    <div class="container">
+        <!--main data -->
+        <div class="row">
+            <div class="col-md-4">
+                <div id="networkInformationWrapper">
+                    <div class="panel-group">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4><b>Network Information</b></h4></div>
+                            <!-- h2 >Network Information</h2 -->
+                            <table class="table table-hover table-responsive nwkInformationTable">
+                                <tr>
+                                    <td>PanID</td>
+                                    <td><span id="panid"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>Coord Addr</td>
+                                    <td><span id="coordAddr"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>Network Mode</td>
+                                    <td><span id="networkmode"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>Security</td>
+                                    <td><span id="security"></span></td>
+                                </tr>
+
+                                <tr class="networkstate">
+                                    <td id="nwkStateText">
+                                        Network close for New Devices
+                                    </td>
+                                    <td>
+                                        <button type=button class=btn btn-default id="allowJoin">open</button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="panel-group">
+                        <div class="panel panel-default">
+                            <div id="networkConvasPanel" class="panel-heading">
+                                <h4><b>Network</b></h4></div>
+                            <canvas id="networkCanvas" class="canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <!-- Device List Information Box -->
+                <div class="panel-group">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4><b>Sensor Nodes</b></h4></div>
+                        <table class="table table-hover table-responsive">
+                            <tr >
+                                <th class="text-left">Device Info</th>
+                                <th class="text-center">Sensors Data</th>
+                                <th class="text-center">Toggle-Req</th>
+                            </tr>
+                        </table>
+                        <div id="ConnectedDeviceWrapper">
+                            <table id="deviceTable" class="table table-hover table-responsive ">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            <div id="humChart">
+            </div>
+
+            <div id="tempChart">
+            </div>
+
+            <div id="iluChart">
+            </div>
+
+
+            </div>
+
+
+       </div>
+
+        <footer>
+            <p>&copy; 2016-17 Texas Instruments Incorporated.</p>
+        </footer>
+    </div>
+    <!-- /container -->
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="dist/jquery/jquery-1.12.0.min.js"></script>
+    <script>
+        window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')
+    </script>
+    <script src="dist/js/bootstrap.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script type="text/javascript" src="dist/jquery/jquery.jqplot.min.js"></script>
+    <script type="text/javascript" src="dist/jquery/jqplot.logAxisRenderer.js"></script>
+    <script type="text/javascript" src="dist/jquery/jqplot.canvasTextRenderer.js"></script>
+    <script type="text/javascript" src="dist/jquery/jqplot.canvasAxisLabelRenderer.js"></script>
+    <script type="text/javascript" src="dist/jquery/jqplot.canvasAxisTickRenderer.js"></script>
+    <script type="text/javascript" src="dist/jquery/jqplot.dateAxisRenderer.js"></script>
+    <script type="text/javascript" src="dist/jquery/jqplot.categoryAxisRenderer.js"></script>
+    <link rel="stylesheet" type="text/css" href="dist/css/jquery.jqplot.css" />
+
+
+    <script>
+
+    $(function(){
+
+    var devs = {};
+    var socket = io.connect();
+    /* Device table */
+    var $deviceTable = $('#deviceTable');
+
+    /* Network Information Block */
+    var $panid = $('#panid');
+    var $coordAddr = $('#coordAddr');
+    var $security = $('#security');
+    var $networkmode = $('#networkmode');
+
+    /* connected device information */
+    var connectedDeviceArray;
+    var devArrayRequested = 0;
+
+    /* Request device list and newtork information on successful connection */
+    socket.on('connect', function () {
+        /* Request device array */
+        if (devArrayRequested === 0) {
+        	socket.emit('getNwkInfoReq');
+            socket.emit('getDevArrayReq');
+            devArrayRequested = 1;
+        }
+    });
+
+    /* Handling Newtork open close button */
+    var $allowJoin = $('#allowJoin');
+    var buttonTimer;
+
+    /* Initialize network state button */
+    $('.networkstate').hide();
+
+    /* callback function */
+    function collectorApp_permitJoinButtonCb() {
+        /* did not recieve a confirm to the request */
+        clearInterval(buttonTimer);
+
+        if ($allowJoin.html() == "opening..") {
+            /* need to retry */
+            $allowJoin.html("open");
+        }
+        else if ($allowJoin.html() == "closing..") {
+            /* need to retry */
+            $allowJoin.html("close");
+        }
+    }
+
+    /* Handle button press */
+    $allowJoin.click(function () {
+        if ($allowJoin.text() == "open") {
+            /* network is open - lets close */
+            socket.emit('setJoinPermit', { action: 'open' });
+            $allowJoin.html("opening..");
+            buttonTimer = setInterval(collectorApp_permitJoinButtonCb, 2000);
+        }
+        else {
+            /* network is closed - lets open */
+            socket.emit('setJoinPermit', { action: 'close' });
+            $allowJoin.html("closing..");
+            buttonTimer = setInterval(collectorApp_permitJoinButtonCb, 2000);
+        }
+    });
+
+
+
+     /*********************************************************************
+     * Plotting functions
+     * *******************************************************************/
+
+     /* Initialize */
+     var networkCanvas = document.getElementById('networkCanvas');
+     var networkCanvasContext = networkCanvas.getContext('2d');
+
+    /* After getting the device array response plot the devices */
+    function collectorApp_drawNetwork(devArray) {
+        var width = networkCanvas.width;
+        var height = networkCanvas.height;
+
+        /* erase the canvas */
+        networkCanvasContext.clearRect(0, 0, width, height);
+
+        /* set canvas x/y to center */
+        networkCanvasContext.translate(width / 2, height / 2);
+
+        /* variables used for plotting*/
+        var x, y, r, s, angle, i;
+
+        /* draw central node -- panCoord
+        set up pan-coord parameters */
+        x = 0;
+        y = 0;
+        s = 7;
+        color = "DarkBlue";
+        /* draw concentrator */
+        networkCanvasContext.beginPath();
+        networkCanvasContext.arc(x, y, s, 0, 2 * Math.PI);
+        networkCanvasContext.fillStyle = color;
+        networkCanvasContext.fill();
+        /* select the starting angle for the first node to be 90 */
+        angle = 90;
+        /* calculate the difference in angle between two devices */
+        var diff = 360 / connectedDeviceArray.length;
+        /* draw nodes */
+        for (i = 0; i < connectedDeviceArray.length; i++) {
+            color = "grey";
+            angle = 90 + (i * diff);
+
+            rssi = connectedDeviceArray[i].rssi;
+            /* set parameters */
+            /* scale RSSI for short range */
+            r = ((height - 80) / 2) * (rssi / -128) + (s * 3);
+            x = r * Math.cos((angle * (Math.PI / 180)));
+            y = r * Math.sin((angle * (Math.PI / 180)));
+            s = 7;
+            /* Draw line to Concentrator (node 0) */
+            networkCanvasContext.setLineDash([5, 2]);
+            networkCanvasContext.beginPath();
+            networkCanvasContext.moveTo(0, 0);
+            networkCanvasContext.lineTo(x, y);
+            networkCanvasContext.strokeStyle = 'black';
+            networkCanvasContext.stroke();
+            /* render the node */
+            networkCanvasContext.beginPath();
+            networkCanvasContext.arc(x, y, s, 0, 2 * Math.PI);
+            networkCanvasContext.fillStyle = color;
+            networkCanvasContext.fill();
+        }
+        /* set canvas x/y back to 0,0 */
+        networkCanvasContext.translate(-(width / 2), -(height / 2));
+    }
+
+
+    /**********************************************************************
+    Process incoming message from the server
+    ***********************************************************************/
+    /* JSON object coming in for each of the messages below
+        has following elements
+        {
+            active,
+            capabilityInfo,
+            extAddress,
+            humiditysensor,
+                {
+                    humidity,
+                    temp
+                }
+            lightsensor,
+                {
+                    rawData
+                }
+            pollingInterval,
+            reportingInterval,
+            rssi,
+            shortAddress,
+            temperaturesensor,
+                {
+                    ambienceTemp,
+                    objectTemp
+                }
+        }
+    */
+
+    function updateDevs(extAddr){
+
+        var addr = extAddr;
+        var element = {"hum" : [], "ilu" : [], "temp" : []};
+        var length;
+
+        if(!devs.hasOwnProperty(addr)){
+            console.log("does not have hasOwnProperty");
+            devs[addr] = element;
+
+        }
+
+        else{
+
+            length = devs[addr].hum.length;
+            console.log("length is:" + length.toString());
+            if( length >= 60){
+                console.log("its greater than 60!!");
+                devs[addr].hum.shift();
+            }
+
+            length = devs[addr].temp.length;
+
+            if(length >= 60){
+                devs[addr].temp.shift();
+            }
+
+            length = devs[addr].ilu.length;
+
+            if(length >= 60){
+                devs[addr].ilu.shift();
+            }
+        }
+    }
+
+    function collectorApp_updateNwkInfo(data) {
+        /* clear the curent table entries */
+        $deviceTable.empty();
+        connectedDeviceArray = JSON.parse(data);
+        var len = connectedDeviceArray.length;
+        var count;
+
+        /* Draw Network */
+        collectorApp_drawNetwork(connectedDeviceArray);
+
+        for (count = 0; count < len; count++) {
+            var devInfo = connectedDeviceArray[count];
+            var sAddr;
+            var extAddr = "";
+            var sensorS = '<table id=SensorID class="table table-hover table-responsive ">';
+            /* sensor data and rssi is not present when a device
+            info is recieved just after join */
+            var sensorDataFound = 0;
+            var rssi;
+
+            if (devInfo.hasOwnProperty('rssi')){
+                rssi = devInfo.rssi;
+            }
+            else {
+                rssi = "--";
+            }
+
+            /* Set the values to update */
+            if (devInfo.hasOwnProperty('shortAddress')
+                && devInfo.hasOwnProperty('extAddress')) {
+                /* short address */
+                sAddr = devInfo.shortAddress.slice(2);
+                /* Extended address */
+                extAddr = devInfo.extAddress.slice(2).toString(16);
+
+            }
+            else {
+                console.log("new device message missing required parameters");
+                continue;
+            }
+
+            updateDevs(extAddr);
+
+            /* Check supported sensors and get the values */
+            if (devInfo.hasOwnProperty('humiditysensor')) {
+                sensorDataFound = 1;
+
+                devs[extAddr].hum.push(parseFloat(devInfo.humiditysensor.humidity).toFixed(1));
+
+                sensorS += '<tr><td><img src="dist/images/Humidity.png " alt="some_text" height="30" width="30"></td><td>' + parseFloat(devInfo.humiditysensor.humidity).toFixed(1) + '% RH </td></tr>';
+            }
+            if (devInfo.hasOwnProperty('temperaturesensor')) {
+                sensorDataFound = 1;
+
+                devs[extAddr].temp.push(parseFloat(devInfo.temperaturesensor.ambienceTemp).toFixed(1));
+
+                sensorS += '<tr><td><img src="dist/images/Temperature.png " alt="some_text" height="30" width="30"></td><td>' + parseFloat(devInfo.temperaturesensor.ambienceTemp).toFixed(1) + '&deg;C</td></tr>';
+            }
+
+            if (devInfo.hasOwnProperty('lightsensor')) {
+                sensorDataFound  = 1;
+
+                devs[extAddr].ilu.push(devInfo.lightsensor.rawData);
+
+                sensorS += '<tr><td><img src="dist/images/Light.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.lightsensor.rawData + 'lux </td></tr>';
+            }
+
+            if (devInfo.hasOwnProperty('doorlock')) {
+                sensorDataFound  = 1;
+                console.log("checking actuator status");
+                if(devInfo.doorlock.value == 1){
+                    sensorS += '<tr><td><img src="dist/images/Lock.png " alt="some_text" height="30" width="30"></td><td>' + 'Locked </td></tr>';
+                }
+                else if(devInfo.doorlock.value == 0){
+                    sensorS += '<tr><td><img src="dist/images/Unlock.png " alt="some_text" height="30" width="30"></td><td>' + 'Unlocked </td></tr>';
+                }
+            }
+
+            if (devInfo.hasOwnProperty('fan')) {
+                sensorDataFound  = 1;
+                console.log("checking actuator status");
+                sensorS += '<tr><td><img src="dist/images/Fan.png " alt="some_text" height="30" width="30"></td><td>Speed: ' + devInfo.fan.value +'</td><tr>';
+            }
+
+            if(devInfo.hasOwnProperty("pressuresensor")){
+                sensorDataFound = 1;
+                sensorS += '<tr><td><img src="dist/images/Pressure.png " alt="some_text" height="30" width="30"></td><td>' + Math.round(devInfo.pressuresensor.pressure) + ' Pa </td></tr>';
+            }
+
+            if (devInfo.hasOwnProperty('motionsensor')) {
+                sensorDataFound = 1;
+                //console.log("Motion: ", devInfo.motionsensor.isMotion);
+                if (devInfo.motionsensor.isMotion) {
+                    sensorS += '<tr><td><img src="dist/images/Motion.png" height="30" width="30"></td><td>' + 'Motion Detected' + '</td></tr>';
+                } else {
+                    sensorS += '<tr><td><img src="dist/images/No_Motion.png" height="30" width="30"></td><td>'+ 'No Motion' +'</td></tr>';
+                }
+
+            }
+
+            if (devInfo.hasOwnProperty('halleffectsensor')) {
+                sensorDataFound = 1;
+                //console.log("Door/Window isOpen: ",devInfo.halleffectsensor.isOpen);
+                if(devInfo.halleffectsensor.isOpen) {
+                    sensorS += '<tr><td><img src="dist/images/door_open.png" height="30" width="30"></td><td>' + 'Door/Window Open' + '</td></tr>';
+                } else {
+                    sensorS += '<tr><td><img src="dist/images/door.png" height="30" width="30"></td><td>' + 'Door/Window Closed' + '</td></tr>';
+                }
+            }
+
+            if (devInfo.hasOwnProperty('batterysensor')) {
+                sensorDataFound = 1;
+                //console.log("BatteryVoltage: ", devInfo.batterysensor.voltageValue);
+                if (devInfo.batterysensor.voltage > 2800)
+                {
+                    sensorS += '<tr><td><img src="dist/images/battery_full.png" height="30" width="30"></td><td>' + devInfo.batterysensor.voltage+ ' mV </td></tr>';
+                }
+                else if (devInfo.batterysensor.voltage > 2300)
+                {
+                    sensorS += '<tr><td><img src="dist/images/battery_half.png" height="30" width="30"></td><td>' + devInfo.batterysensor.voltage+ ' mV </td></tr>';
+                }
+                else
+                {
+                    sensorS += '<tr><td><img src="dist/images/battery_low.png" height="30" width="30"></td><td>' + devInfo.batterysensor.voltage+ ' mV </td></tr>';
+                }
+
+            }
+
+            if (devInfo.hasOwnProperty('lastreported')) {
+                sensorDataFound = 1;
+                //console.log("Lastreported: ", devInfo.lastreported);
+                sensorS += '<tr><td><img src="dist/images/time.png" height="30" width="30"></td><td>' + devInfo.lastreported + '</td></tr>';
+
+
+            }
+
+            if (sensorDataFound == 0)
+            {
+                sensorS += "--";
+            }
+
+            sensorS += '</table>';
+
+                /* add/update device information */
+                $deviceTable.prepend('<tr><td><table class="table table-responsive"><tr><td>SAddr: 0x' + sAddr.toString(16) + '</td></tr><tr  class="ieee"><td>ExAddr: 0x' + extAddr.toString(16).toUpperCase() + '</td></tr><tr><td>RSSI: ' + rssi + ' dBm</td></tr></table></td><td>' + sensorS + '</td>><td>' + "<p button type=button class='test btn btn-default'>Red LED" + "</p>"+'</td></tr>');
+
+            if (devInfo.active == 'true') {
+                /* active device */
+            }
+            else {
+                $('#deviceTable tr:first').fadeTo(1000, 0.4);
+            }
+        }
+    }
+
+ $deviceTable.on("click", "p.submit", function(){
+    var speed =  $("#Speed").val();
+    let data = $(this).closest('tr').find('td:first').text();
+    let n = data.indexOf("ExAddr");
+    let m = data.indexOf("0x");
+    var shortAddr = data.substring((m),(n));
+    socket.emit('sendToggle', {dstAddr: shortAddr, value: speed});
+ });
+
+  $deviceTable.on("click", "p.test", function(){
+
+    var value = $('#toggle').text();
+    console.log("value:" + value.toString());
+    let data = $(this).closest('tr').find('td:first').text();
+    let n = data.indexOf("ExAddr");
+    let m = data.indexOf("0x");
+    var shortAddr = data.substring((m),(n));
+    console.log("addr:" + shortAddr.toString());
+
+    if(value == "Lock"){
+        socket.emit('sendToggle', {dstAddr: shortAddr, value: 1});
+    }
+    else{
+        socket.emit('sendToggle', {dstAddr: shortAddr, value: 0});
+    }
+  });
+
+  $deviceTable.on("click", "p.graph", function(){
+
+        $('#humChart').empty();
+        $('#tempChart').empty();
+        $('#iluChart').empty();
+
+        $('#humChart').hide();
+        $('#tempChart').hide();
+        $('#iluChart').hide();
+
+        var extAddr = $(this).closest('tr').find('td:eq(1)');
+
+        var humChart = [];
+        humChart = devs[extAddr.text().toLowerCase()].hum;
+
+        var tempChart = [];
+        tempChart = devs[extAddr.text().toLowerCase()].temp;
+
+        var iluChart = [];
+        iluChart = devs[extAddr.text().toLowerCase()].ilu;
+
+        if(humChart.length > 1){
+            $('#humChart').show();
+            var plot1 = $.jqplot('humChart', [humChart], {
+            legend: {show:false},
+            axes:{
+              xaxis:{
+              tickOptions:{
+                angle: -30
+              },
+              tickRenderer:$.jqplot.CanvasAxisTickRenderer,
+                label:'Time',
+              labelOptions:{
+                fontFamily:'Helvetica',
+                fontSize: '14pt'
+              },
+              labelRenderer: $.jqplot.CanvasAxisLabelRenderer
+              },
+              yaxis:{
+                renderer:$.jqplot.LogAxisRenderer,
+                tickOptions:{
+                    labelPosition: 'middle',
+                    angle:-30
+                },
+                tickRenderer:$.jqplot.CanvasAxisTickRenderer,
+                labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                labelOptions:{
+                    fontFamily:'Helvetica',
+                    fontSize: '14pt'
+                },
+                label:'Humidity Over Time'
+              }
+            }
+            });
+        }
+
+        if(tempChart.length > 1){
+            $('#tempChart').show();
+            var plot2 = $.jqplot('tempChart', [tempChart], {
+            legend: {show:false},
+            axes:{
+              xaxis:{
+              tickOptions:{
+                angle: -30
+              },
+              tickRenderer:$.jqplot.CanvasAxisTickRenderer,
+                label:'Time',
+              labelOptions:{
+                fontFamily:'Helvetica',
+                fontSize: '14pt'
+              },
+              labelRenderer: $.jqplot.CanvasAxisLabelRenderer
+              },
+              yaxis:{
+                renderer:$.jqplot.LogAxisRenderer,
+                tickOptions:{
+                    labelPosition: 'middle',
+                    angle:-30
+                },
+                tickRenderer:$.jqplot.CanvasAxisTickRenderer,
+                labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                labelOptions:{
+                    fontFamily:'Helvetica',
+                    fontSize: '14pt'
+                },
+                label:'Temperature Over Time'
+              }
+            }
+            });
+        }
+
+
+        if(iluChart.length > 1){
+            $('#iluChart').show();
+            var plot3 = $.jqplot('iluChart', [iluChart], {
+            legend: {show:false},
+            axes:{
+              xaxis:{
+              tickOptions:{
+                angle: -30
+              },
+              tickRenderer:$.jqplot.CanvasAxisTickRenderer,
+                label:'Time',
+              labelOptions:{
+                fontFamily:'Helvetica',
+                fontSize: '14pt'
+              },
+              labelRenderer: $.jqplot.CanvasAxisLabelRenderer
+              },
+              yaxis:{
+                renderer:$.jqplot.LogAxisRenderer,
+                tickOptions:{
+                    labelPosition: 'middle',
+                    angle:-30
+                },
+                tickRenderer:$.jqplot.CanvasAxisTickRenderer,
+                labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                labelOptions:{
+                    fontFamily:'Helvetica',
+                    fontSize: '14pt'
+                },
+                label:'Lux Over Time'
+              }
+            }
+        });
+        }
+    });
+
+
+    /* Rcvd device array */
+    socket.on('getdevArrayRsp', function (data) {
+
+        /* Check if the devices are connected */
+        if(data) {
+            /*update device information */
+            collectorApp_updateNwkInfo(data);
+        }
+        /* Request network information */
+        socket.emit('getNwkInfoReq');
+    });
+
+    /* Rcvd network information */
+    socket.on('nwkUpdate', function (data) {
+        /* Check if the network is connected */
+        if (!data) {
+            console.log("network is not started yet, we wait for update");
+            /* Non Hopping Network */
+            $panid.text('--');
+            $coordAddr.text('--');
+            $security.text('--');
+            $networkmode.text("Not Started");
+            /* exit */
+            return false;
+        }
+
+        var nwkInfo = JSON.parse(data);
+        $panid.text('0x' + nwkInfo.panCoord.panId.toString(16).slice(2).toUpperCase());
+        $coordAddr.text('0x' + nwkInfo.panCoord.shortAddress.toString(16).slice(2).toUpperCase());
+        $networkmode.text(nwkInfo.networkMode);
+        if (nwkInfo.securityEnabled === 1 ) {
+            $security.text("Enabled");
+        }
+        else {
+            $security.text("Disabled");
+        }
+
+        /* Out of box example application does not
+        support opening/closing the network in frequency hopping configuration */
+        if(nwkInfo.networkMode == "Freq Hopping"){
+            /* Hide the option to open or close the network for new device
+            joins */
+            $("#nwkInformationTable tbody tr.networkstate").hide();
+        }
+
+
+        /* Display Network State Information */
+        if (nwkInfo.state == "started") {
+            $("#nwkStateText").text("Network close for New Devices");
+            $allowJoin.text("open");
+            $('.networkstate').show();
+        }
+        else if (nwkInfo.state == "open") {
+            $("#nwkStateText").text("Network open for New Devices");
+            $allowJoin.text("close");
+            $('.networkstate').show();
+        }
+        else if (nwkInfo.state == "close") {
+            $("#nwkStateText").text("Network close for New Devices");
+            $allowJoin.text("open");
+            $('.networkstate').show();
+        }
+    });
+
+    /* Cloud Info Update */
+    $("#changeBtn").click(function(){
+
+        var data =  {
+            ServiceName : $("#ServiceName").val(),
+            Id : $("#Id").val(),
+            Org : $("#Org").val(),
+            ApiKey : $("#ApiKey").val(),
+            ApiToken : $("#ApiToken").val(),
+            type : $("#type").val(),
+            typeId : $("#typeId").val()
+        };
+
+        console.log(JSON.stringify(data));
+
+        socket.emit('setIBMCredentials', data);
+    });
+
+    /* Rcvd connDevInfoUpdate message */
+    socket.on('connDevInfoUpdate', function (data) {
+        collectorApp_updateNwkInfo(data);
+    });
+
+    /* Rcvd permit join cnf */
+    socket.on('permitJoinCnf', function (data) {
+        clearInterval(buttonTimer);
+        if(data == "open"){
+            if ($allowJoin.html() == "opening..") {
+                /* need to retry */
+                $allowJoin.html("close");
+            }
+        }
+        else if(data == "close"){
+            if ($allowJoin.html() == "closing..") {
+                /* need to retry */
+                $allowJoin.html("open");
+            }
+        }
+
+    });
+
+    /* close connection */
+    $(window).on('beforeunload', function(){
+    socket.close();
+    });
+});
+    </script>
+</body>
+</html>
