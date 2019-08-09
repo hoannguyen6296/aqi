@@ -89,6 +89,7 @@
 /* Default configuration frame control */
 #define CONFIG_FRAME_CONTROL (Smsgs_dataFields_tempSensor | \
                               Smsgs_dataFields_lightSensor | \
+							  Smsgs_aqiCalculationFlield_t| \
                               Smsgs_dataFields_msgStats | \
                               Smsgs_dataFields_configSettings | \
                               Smsgs_dataFields_dustSensor)
@@ -1217,9 +1218,18 @@ static void processSensorData(ApiMac_mcpsDataInd_t *pDataInd)
 		pBuf += 2;
 		sensorData.lightSensor.pm25_en = Util_buildUint16(pBuf[0], pBuf[1]);
 		pBuf += 2;
-
-
     }
+	if (sensorData.frameControl & Smsgs_aqiCalculationFlield_t)
+	{
+		sensorData.aqiCalculation.O3_avg = Util_bufferUint16(pBuf[0], pBuf[1]);
+		pBuf += 2;
+		sensorData.aqiCalculation.CO_avg = Util_bufferUint16(pBuf[0], pBuf[1]);
+		pBuf += 2;
+		sensorData.aqiCalculation.SO2_avg = Util_bufferUint16(pBuf[0], pBuf[1]);
+		pBuf += 2;
+		sensorData.aqiCalculation.NO2_avg = Util_bufferUint16(pBuf[0], pBuf[1]);
+		pBuf += 2;
+	}
 
 
     if(sensorData.frameControl & Smsgs_dataFields_msgStats)

@@ -923,6 +923,19 @@ static void appsrv_deviceSensorData_common(ApiMac_sAddr_t *pSrcAddr,
 			*pBuff++ = (uint8_t)(pDataMsg->dustSensor.pm25_env & 0xFF);
 			*pBuff++ = (uint8_t)((pDataMsg->dustSensor.pm25_env >> 8) & 0xFF);
 		}
+
+		if (pDataMsg->frameControl & Smsgs_dataFields_aqiCalculation)
+		{
+			len += 8;
+			*pBuff = (uint8_t)(pDataMsg->aqiCalculation.O3_avg & 0xFF);
+			*pBuff = (uint8_t)(pDataMsg->aqiCalculation.O3_avg >> 8) & 0xFF);
+			*pBuff = (uint8_t)(pDataMsg->aqiCalculation.CO_avg & 0xFF);
+			*pBuff = (uint8_t)(pDataMsg->aqiCalculation.CO_avg >> 8) & 0xFF);
+			*pBuff = (uint8_t)(pDataMsg->aqiCalculation.SO2_avg & 0xFF);
+			*pBuff = (uint8_t)(pDataMsg->aqiCalculation.SO2_avg >> 8) & 0xFF);
+			*pBuff = (uint8_t)(pDataMsg->aqiCalculation.NO2_avg & 0xFF);
+			*pBuff = (uint8_t)(pDataMsg->aqiCalculation.NO2_avg >> 8) & 0xFF);
+		}
         if(pDataMsg->frameControl & Smsgs_dataFields_msgStats)
         {
             len += 40;

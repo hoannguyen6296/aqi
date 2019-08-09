@@ -183,7 +183,7 @@ extern "C"
 /*! Length of the lightSensor portion of the sensor data message */
 #define SMSGS_SENSOR_LIGHT_LEN 8
 /*! Length of the humiditySensor portion of the sensor data message */
-#define SMSGS_SENSOR_HUMIDITY_LEN 4
+#define SMSGS_SENSOR_AQICALCULATION_LEN 8
 /*! Length of the pressureSensor portion of the sensor data message */
 #define SMSGS_SENSOR_PRESSURE_LEN 8
 /*! Length of the motionSensor portion of the sensor data message */
@@ -259,6 +259,8 @@ typedef enum
     Smsgs_dataFields_tempSensor = 0x0001,
     /*! Light Sensor */
     Smsgs_dataFields_lightSensor = 0x0002,
+	/*! AQI Calculation */
+	Smsgs_dataFields_aqiCalculation = 0x0004,
     /*! Message Statistics */
     Smsgs_dataFields_msgStats = 0x0008,
     /*! Config Settings */
@@ -407,14 +409,6 @@ typedef struct _Smsgs_lightsensorfield_t
 } Smsgs_lightSensorField_t;
 
 
-/*!
-    Hall Effect Sensor Field
-*/
-typedef struct _Smsgs_hallEffectSensorField_t
-{
-    bool isOpen;
-    bool isTampered;
-} Smsgs_hallEffectSensorField_t;
 
  /*!
  Generic Sensor Field
@@ -424,6 +418,12 @@ typedef struct _Smsgs_hallEffectSensorField_t
 	 uint16_t pm10_env, pm25_env;
 	 
  } Smsgs_dustSensorField_t;
+
+ /*! AIQ Calculation dataField */
+ typedef struct _Smsgs_aiqcalculationfields_t
+ {
+	 uint16_t O3_avg, CO_avg, SO2_avg, NO2_avg;
+ } Smsgs_aqiCalculationFlield_t;
 
 /*!
  Message Statistics Field
@@ -534,16 +534,10 @@ typedef struct _Smsgs_sensormsg_t
      */
     Smsgs_configSettingsField_t configSettings;
     /*!
-        Pressure Sensor field - valid only if
-        Smsgs_dataFields_pressureSensor is set in frameControl.
+        Avg Sensor Calculation field - valid only if
+        Smsgs_dataFields_aqiCalcualtion is set in frameControl.
      */
- 
-    /*!
-        Hall Effect Sensor Field - valid only if
-        Smsgs_dataFields_hallEffectSensor is set in frameControl.
-    */
-    Smsgs_hallEffectSensorField_t hallEffectSensor;
- 
+	Smsgs_aqiCalculationFlield_t aqiCalculation;
     /*!
      Generic Sensor field - valid only if Smsgs_dataFields_genericSensor
      is set in frameControl.

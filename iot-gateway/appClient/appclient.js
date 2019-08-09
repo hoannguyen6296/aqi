@@ -97,6 +97,7 @@ var cmdIds = Object.freeze({
 var Smsgs_dataFields = Object.freeze({
     tempSensor: 0x0001,
     lightSensor: 0x0002,
+    aqiCalculation: 0x0004,
     msgStats: 0x0008,
     configSettings: 0x0010,
     dustSensor: 0x0800
@@ -584,6 +585,18 @@ function Appclient() {
                 deviceData.sDataMsg.lightSensor.pm25_en = data.readUint16(ind);
                 ind += 2;
 
+            }
+        /* AQI calculation data received */
+            if (deviceData.sDataMsg.frameControl & Smsgs_dataFields.aqiCalculation) {
+                deviceData.sDataMsg.aqiCalculation = {};
+                deviceData.sDataMsg.aqiCalculation.O3_avg = data.readUint16(ind);
+                ind += 2;
+                deviceData.sDataMsg.aqiCalculation.CO_avg = data.readUint16(ind);
+                ind += 2;
+                deviceData.sDataMsg.aqiCalculation.SO2_avg = data.readUint16(ind);
+                ind += 2;
+                deviceData.sDataMsg.aqiCalculation.NO2_avg = data.readUint16(ind);
+                ind += 2;
             }
             /* Msg Stats recieved */
             if(deviceData.sDataMsg.frameControl & Smsgs_dataFields.msgStats){

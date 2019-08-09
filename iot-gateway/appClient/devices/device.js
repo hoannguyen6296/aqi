@@ -57,6 +57,7 @@ var Long = require("long");
 var Smsgs_dataFields = Object.freeze({
     tempSensor: 0x0001,
     lightSensor: 0x0002,
+    aqiCalculation: 0x004
     msgStats: 0x0008,
     configSettings: 0x0010,
     dustSensor: 0x0800
@@ -166,7 +167,6 @@ Device.prototype.rxSensorData = function (sensorData) {
             NO2_envm: sensorData.sDataMsg.lightSensor.NO2_envm,
             pm10_en: sensorData.sDataMsg.lightSensor.pm10_en,
             pm25_en: sensorData.sDataMsg.lightSensor.pm25_en,
-
         };
         updateSensor(this.so, 'gas', 0, sensorData.sDataMsg.lightSensor.O3_envm, 'ppb');
         updateSensor(this.so, 'gas', 1, sensorData.sDataMsg.lightSensor.CO_envm, 'ppb');
@@ -185,6 +185,19 @@ Device.prototype.rxSensorData = function (sensorData) {
         updateSensor(this.so, 'dust', 0, sensorData.sDataMsg.dustSensor.pm10_env, ' ug/m3');
         updateSensor(this.so, 'dust', 1, sensorData.sDataMsg.dustSensor.pm25_env, ' ug/m3');
         
+   }
+    if (sensorData.sDataMsg.frameControl & Smsgs_dataFields.aqiCalculation) {
+    /*update AQI Calculation value*/
+        this.aqiCalculation = {
+            O3_avg: sensorData.sDataMsg.aqiCalculation.O3_avg,
+            CO_avg: sensorData.sDataMsg.aqiCalculation.CO_avg,
+            SO2_avg: sensorData.sDataMsg.aqiCalculation.SO2_avg,
+            NO2_avg: sensorData.sDataMsg.aqiCalculation.NO2_avg,
+        };
+        updateSensor(this.so, 'value', 0, sensorData.sDataMsg.aqiCalculation.O3_avg, '');
+        updateSensor(this.so, 'value', 0, sensorData.sDataMsg.aqiCalculation.CO_avg, '');
+        updateSensor(this.so, 'value', 0, sensorData.sDataMsg.aqiCalculation.SO2_avg, '');
+        updateSensor(this.so, 'value', 0, sensorData.sDataMsg.aqiCalculation.NO2_avg, '');
     }
 
     /* update rssi information */
@@ -214,8 +227,8 @@ Device.prototype.rxConfigRspInd = function (devConfigData) {
                 CO_envm: 0,
                 SO2_envm: 0,
                 NO2_envm: 0,
-		pm10_en: 0,
-		pm25_en: 0
+		        pm10_en: 0,
+		        pm25_en: 0
             };
         }
        if (devConfigData.sConfigMsg.frameControl & Smsgs_dataFields.dustSensor) {
@@ -223,6 +236,15 @@ Device.prototype.rxConfigRspInd = function (devConfigData) {
             device.dustsensor = {
                 pm10_env: 0,
                 pm25_env: 0
+            };
+       }
+        if (devConfigData.sConfigMsg.frameControl & Smsgs_dataFields.aqiCalculation) {
+            /*intialize AQI data*/
+            device.aqiCalculation = {
+                O3_avg: 0,
+                CO_avg: 0,
+                SO2_avg: 0,
+                NO2_avg: 0
             };
         }
         device.reportingInterval = devConfigData.sConfigMsg.reportingInterval;

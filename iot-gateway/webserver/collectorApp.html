@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿++++++<!DOCTYPE html>
 <html lang="en">
 <!--
 /******************************************************************************
@@ -169,7 +169,7 @@
                         <div class="panel-heading">
                             <h4><b>AQI</b></h4>
                         </div>
-                        <table class="table table-hover table-responsive">
+                        <table  class="table table-hover table-responsive">
                             <tr >
                                 <th class="text-left">AQI</th>
                                 <th class="text-center">Data</th>  
@@ -416,8 +416,8 @@
         /* Draw Network */
         collectorApp_drawNetwork(connectedDeviceArray);
 
-        for (count = 0; count < len; count++) {
-            var devInfo = connectedDeviceArray[count];
+        for (const index of connectedDeviceArray) {
+            var devInfo = connectedDeviceArray[index];
             var sAddr;
             var extAddr = "";
             var capInfo;
@@ -453,13 +453,7 @@
 
 
             /* Check supported sensors and get the values */
-            if (devInfo.smart_objects.hasOwnProperty('humidity')) {
-                sensorDataFound = 1;
-                //console.log("Raw Humidity: ",devInfo.humiditysensor.humidity);
-                //var hum = Math.round((devInfo.humiditysensor.humidity/65536)*100);
-                //console.log("Humidity: ",devInfo.humiditysensor.humidity);
-                sensorS += '<tr><td><img src="dist/images/Humidity.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.humidity[0].sensorValue + '% RH</td></tr>';
-            }
+
 
                     if (devInfo.smart_objects.hasOwnProperty('temperature')) {
                         sensorDataFound = 1;
@@ -488,29 +482,13 @@
 
             }
 
- 
-       
-
-
-             if (devInfo.smart_objects.hasOwnProperty('voltage')) {
+            if (devInfo.smart_objects.hasOwnProperty('value')) {
                 sensorDataFound = 1;
-                //console.log("BatteryVoltage: ", devInfo.batterysensor.voltageValue);
-                if (devInfo.smart_objects.voltage[0].sensorValue > 2800)
-                {
-                    sensorS += '<tr><td><img src="dist/images/battery_full.png" height="30" width="30"></td><td>' + devInfo.smart_objects.voltage[0].sensorValue+ ' mV </td></tr>';
-                }
-                else if (devInfo.smart_objects.voltage[0].sensorValue > 2300)
-                {
-                    sensorS += '<tr><td><img src="dist/images/battery_half.png" height="30" width="30"></td><td>' + devInfo.smart_objects.voltage[0].sensorValue+ ' mV </td></tr>';
-                }
-                else
-                {
-                    sensorS += '<tr><td><img src="dist/images/battery_low.png" height="30" width="30"></td><td>' + devInfo.smart_objects.voltage[0].sensorValue+ ' mV </td></tr>';
-                }
-
+                sensorS += '<tr><td>' + devInfo.smart_objects.value[0].sensorValue + '</td></tr>';
+                sensorS += '<tr><td>' + devInfo.smart_objects.value[1].sensorValue + '</td></tr>';
+                sensorS += '<tr><td>' + devInfo.smart_objects.value[2].sensorValue + '</td></tr>';
+                sensorS += '<tr><td>' + devInfo.smart_objects.value[3].sensorValue + '</td></tr>';
             }
-
-
 
                if (devInfo.hasOwnProperty('last_reported')) {
                 sensorDataFound = 1;
@@ -533,7 +511,7 @@
                         + rssi + ' dBm</td></tr></table></td><td>'
                         + sensorS + '</td>><td>' + 
                         + "<p button type=button class='test btn btn-default'>Red LED"
-			+"<p button type=button class='genericbutton btn btn-default'>Generic"
+			            +"<p button type=button class='genericbutton btn btn-default'>Generic"
                         + "</p>" + '</td></tr>');
 
             if (devInfo.active == 'true') {
