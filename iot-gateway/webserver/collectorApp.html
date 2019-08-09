@@ -178,23 +178,23 @@
                         <div id="ConnectedDeviceWrapper">
                             <tr>
                                 <td>Average AQI</td>
-                                <td>123</td>
+                                <td><span id = "avgAqi">123</span></td>
                             </tr>
                              <tr>
                                 <td>O3</td>
-                                <td>123 mg</td>
+                                <td><span id = "avgO3">123 mg</span></td>
                             </tr>
                              <tr>
                                 <td>CO3</td>
-                                <td>1232 mg</td>
+                                <td><span id = "avgCo3">1232 mg</span></td>
                             </tr>
                              <tr>
                                 <td>SO3</td>
-                                <td>13 mg</td>
+                                <td><span id = "avgSo3">13 mg</span></td>
                             </tr>
                              <tr>
                                 <td>NO3</td>
-                                <td>3 mg</td>
+                                <td><span id = "avgNo3">3 mg</span></td>
                             </tr>
                         </div>
                     </div>
@@ -232,6 +232,13 @@
     /* connected device information */
     var connectedDeviceArray = [];
     var devArrayRequested = 0;
+
+    /*  Avarage AQI information variable*/
+    var $avgAqi = $('#avgAqi');
+    var $avgO3 = $('#avgO3');
+    var $avgCo3 = $('#avgCo3');
+    var $avgSo3 = $('#avgSo3');
+    var $avgNo3 = $('#avgNo3');
 
     /* Request device list and newtork information on successful connection */
     socket.on('connect', function () {
@@ -414,8 +421,10 @@
         var count;
 
         /* Draw Network */
-        collectorApp_drawNetwork(connectedDeviceArray);
-
+        // TODOs: lock non feature code
+        // collectorApp_drawNetwork(connectedDeviceArray);
+        var sum = [0,0,0,0]; //o3,co3,so3,no3
+        var count = connectedDeviceArray.length;
         for (const index of connectedDeviceArray) {
             var devInfo = connectedDeviceArray[index];
             var sAddr;
@@ -473,13 +482,16 @@
 
             if (devInfo.smart_objects.hasOwnProperty('gas')) {
                 sensorDataFound  = 1;
-                sensorS += '<tr><td><img src="dist/images/O3.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.gas[0].sensorValue + ' ppb </td></tr>';
-                sensorS += '<tr><td><img src="dist/images/CO.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.gas[1].sensorValue + ' ppb </td></tr>';
-                sensorS += '<tr><td><img src="dist/images/SO2.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.gas[2].sensorValue + ' ppb </td></tr>';
-                sensorS += '<tr><td><img src="dist/images/NO2.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.gas[3].sensorValue + ' ppb </td></tr>';
+                sensorS += '<tr><td><img src="dist/images/O3.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.gas[0].sensorValue + ' ppb </td></tr>';// O3 go with index 0
+                sum[0] += Number(devInfo.smart_objects.gas[0].sensorValue) || 0;
+                sensorS += '<tr><td><img src="dist/images/CO.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.gas[1].sensorValue + ' ppb </td></tr>';// co3 go with index 1
+                sum[1] += Number(devInfo.smart_objects.gas[1].sensorValue) || 0;
+                sensorS += '<tr><td><img src="dist/images/SO2.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.gas[2].sensorValue + ' ppb </td></tr>';// so3 go with index 2
+                sum[2] += Number(devInfo.smart_objects.gas[2].sensorValue) || 0;
+                sensorS += '<tr><td><img src="dist/images/NO2.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.gas[3].sensorValue + ' ppb </td></tr>';// no3 go with index 3
+                sum[3] += Number(devInfo.smart_objects.gas[1].sensorValue) || 0;
                 sensorS += '<tr><td><img src="dist/images/Dust.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.gas[4].sensorValue + ' ug/m3 </td></tr>';
                 sensorS += '<tr><td><img src="dist/images/Dust.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.gas[5].sensorValue + ' ug/m3 </td></tr>';
-
             }
 
             if (devInfo.smart_objects.hasOwnProperty('value')) {
@@ -522,6 +534,17 @@
                 $('#deviceTable tr:first').fadeTo(5, 0.4);
             }
         }
+        // TODOs: please check this
+        console.log('i got total of these gas');
+        console.log('O3', sum[0]);
+        console.log('CO3', sum[1]);
+        console.log('SO3', sum[2]);
+        console.log('NO3', sum[3]);
+        $avgAqi.text('Hello mother Fucker')
+        $avgO3.text(`${sum[0]/count}`);
+        $avgCo3.text(`${sum[1]/count}`);
+        $avgSO3.text(`${sum[2]/count}`);
+        $avgNO3.text(`${sum[3]/count}`);
      }
 
 
