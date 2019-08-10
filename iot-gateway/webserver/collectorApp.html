@@ -178,23 +178,23 @@
                         <div id="ConnectedDeviceWrapper">
                             <tr>
                                 <td>Average AQI</td>
-                                <td><span id = "avgAqi">123</span></td>
+                                <td id="avgAqi">12</td>
                             </tr>
                              <tr>
                                 <td>O3</td>
-                                <td><span id = "avgO3">123 mg</span></td>
+                                <td id="avgO3">123 mg</td>
                             </tr>
                              <tr>
                                 <td>CO3</td>
-                                <td><span id = "avgCo3">1232 mg</span></td>
+                                <td id="avgCo3">1232 mg</td>
                             </tr>
                              <tr>
                                 <td>SO3</td>
-                                <td><span id = "avgSo3">13 mg</span></td>
+                                <td id="avgSo3">13 mg</td>
                             </tr>
                              <tr>
                                 <td>NO3</td>
-                                <td><span id = "avgNo3">3 mg</span></td>
+                                <td id="avgNo3">3 mg</td>
                             </tr>
                         </div>
                     </div>
@@ -422,7 +422,7 @@
 
         /* Draw Network */
         // TODOs: lock non feature code
-        // collectorApp_drawNetwork(connectedDeviceArray);
+        collectorApp_drawNetwork(connectedDeviceArray);
         var sum = [0,0,0,0]; //o3,co3,so3,no3
         var count = connectedDeviceArray.length;
         for (const index of connectedDeviceArray) {
@@ -540,7 +540,7 @@
         console.log('CO3', sum[1]);
         console.log('SO3', sum[2]);
         console.log('NO3', sum[3]);
-        $avgAqi.text('Hello mother Fucker')
+        $avgAqi.text(`Hello this is a test on ${new Date()}`)
         $avgO3.text(`${sum[0]/count}`);
         $avgCo3.text(`${sum[1]/count}`);
         $avgSO3.text(`${sum[2]/count}`);
