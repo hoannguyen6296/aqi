@@ -50,6 +50,7 @@
 var fs = require("fs");
 var SmartObject = require('smartobject');
 var Long = require("long");
+var aqibot = require('aqi-bot');
 
 /********************************************************************
  * Defines
@@ -57,13 +58,18 @@ var Long = require("long");
 var Smsgs_dataFields = Object.freeze({
     tempSensor: 0x0001,
     lightSensor: 0x0002,
-    aqiCalculation: 0x004
+    aqiCalculation: 0x004,
     msgStats: 0x0008,
     configSettings: 0x0010,
     dustSensor: 0x0800
 });
 
-
+var aqi = {
+    ozone: 0,
+    co: 0,
+    so2: 0,
+    no2: 0,
+}
 /*!
  * @brief      Constructor for device objects
  *
@@ -73,6 +79,17 @@ var Smsgs_dataFields = Object.freeze({
  *
  * @retun      device object
  */
+
+function calAqi(type, avg) {
+    var aqi = 0;
+    aqibot.AQICalculator.getAQIResult(type, avg).then((res) => {
+        aqi = res;
+    }).catch(err => {
+        console.log(err);
+    })
+    return aqi;
+}
+
 function Device(shortAddress, extAddress, capabilityInfo) {
     var devInfo = this;
     devInfo.shortAddress = shortAddress;
@@ -80,6 +97,12 @@ function Device(shortAddress, extAddress, capabilityInfo) {
     devInfo.capabilityInfo = capabilityInfo;
     devInfo.active = 'true';
     devInfo.so = new SmartObject();
+    devInfo.aqi = {
+        ozone: calAqi("O3", aqi.ozone),
+        co: calAqi("CO", aqi.co),
+        so2: calAqi("SO2", aqi.so2),
+        no2: calAqi("NO2", aqi.no2),
+    }
     return devInfo;
 }
 
@@ -127,21 +150,6 @@ function updateXYZSensor(so, type, instance, x, y, z, units) {
 	}
 }
 
-function updateDigInSensor(so, type, instance, state, desc){
-	/* Sensor already exists, update its values */
-	if (so.has(type, instance)) {
-		so.write(type, instance, 'dInState', state, function (err, data) { });
-		so.write(type, instance, 'sensorType', desc, function (err, data) { });
-	}
-
-	/* Need to initialize the sensor */
-	else {
-		so.init(type, instance, {
-			"dInState" : state,
-			"sensorType" : desc
-		});
-	}
-}
 
 /* Prototype Functions */
 Device.prototype.rxSensorData = function (sensorData) {
@@ -165,15 +173,16 @@ Device.prototype.rxSensorData = function (sensorData) {
             CO_envm: sensorData.sDataMsg.lightSensor.CO_envm,
             SO2_envm: sensorData.sDataMsg.lightSensor.SO2_envm,
             NO2_envm: sensorData.sDataMsg.lightSensor.NO2_envm,
-            pm10_en: sensorData.sDataMsg.lightSensor.pm10_en,
-            pm25_en: sensorData.sDataMsg.lightSensor.pm25_en,
+
         };
         updateSensor(this.so, 'gas', 0, sensorData.sDataMsg.lightSensor.O3_envm, 'ppb');
         updateSensor(this.so, 'gas', 1, sensorData.sDataMsg.lightSensor.CO_envm, 'ppb');
         updateSensor(this.so, 'gas', 2, sensorData.sDataMsg.lightSensor.SO2_envm, 'ppb');
         updateSensor(this.so, 'gas', 3, sensorData.sDataMsg.lightSensor.NO2_envm, 'ppb');
-        updateSensor(this.so, 'gas', 4, sensorData.sDataMsg.lightSensor.pm10_en, ' ug/m3');
-        updateSensor(this.so, 'gas', 5, sensorData.sDataMsg.lightSensor.pm25_en, ' ug/m3');
+        aqi.ozone = Number(sensorData.sDataMsg.lightSensor.O3_envm);
+        aqi.co = Number(sensorData.sDataMsg.lightSensor.CO_envm);
+        aqi.so2 = Number(sensorData.sDataMsg.lightSensor.SO2_envm);
+        aqi.no2 = Number(sensorData.sDataMsg.lightSensor.NO2_envm)
 
     }
    if (sensorData.sDataMsg.frameControl & Smsgs_dataFields.dustSensor) {

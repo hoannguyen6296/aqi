@@ -179,23 +179,23 @@
                                 </tr>
                                 <tr>
                                     <td>O3_AQI</td>
-                                    <td><span id="o3_aqi"></span></td>
+                                    <td><span id="oxy_aqi" align="center"></span></td>
                                 </tr>
                                 <tr>
                                     <td>CO_AQI</td>
-                                    <td><span id="co_aqi"></span></td>
+                                    <td><span id="co_aqi" align="center"></span></td>
                                 </tr>
                                 <tr>
                                     <td>SO2_AQI</td>
-                                    <td><span id="so2_aqi"></span></td>
+                                    <td><span id="so2_aqi" align="center"></span></td>
                                 </tr>
                                 <tr>
                                     <td>NO2_AQI</td>
-                                    <td><span id="no2_api"></span></td>
+                                    <td><span id="no2_api" align="center"></span></td>
                                 </tr>
                                 <tr>
                                     <td>PM25_AQI</td>
-                                    <td><span id="pm25_aqi"></span></td>
+                                    <td><span id="pm25_aqi" align="center"></span></td>
                                 </tr>
                             </table>
                         </div>
@@ -216,7 +216,7 @@
         <script src="dist/js/bootstrap.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script>
-    $(function () {
+            $(function () {
                 var socket = io.connect();
                 /* Device table */
                 var $deviceTable = $('#deviceTable');
@@ -231,7 +231,10 @@
                 /* connected device information */
                 var connectedDeviceArray = [];
                 var devArrayRequested = 0;
-
+                var $oxy_aqi = $('#oxy_aqi');
+                var $co_aqi = $('#co_aqi');
+                var $so2_aqi = $('#so2_aqi');
+                var $no2_aqi = $('#no2_api');
 
 
                 /* Request device list and newtork information on successful connection */
@@ -416,9 +419,10 @@
 
                     /* Draw Network */
                     collectorApp_drawNetwork(connectedDeviceArray);
-
+                    let sum = [0, 0, 0, 0];
                     for (count = 0; count < len; count++) {
                         var devInfo = connectedDeviceArray[count];
+                        console.log(devInfo);
                         var sAddr;
                         var extAddr = "";
                         var capInfo;
@@ -481,10 +485,34 @@
                         if (devInfo.smart_objects.hasOwnProperty('gas')) {
                             sensorDataFound = 1;
                             sensorS += '<tr><td><img src="dist/images/O3.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.gas[0].sensorValue + ' ppb </td></tr>';
+                            console.log('---------------------------------');
+                            console.log(devInfo.smart_objects.gas[0].sensorValue);
+                            console.log('---------------------------------');
+                            console.log(devInfo.smart_objects.gas[1].sensorValue);
+                            console.log('---------------------------------');
+                            console.log(devInfo.smart_objects.gas[2].sensorValue);
+                            console.log('---------------------------------');
+                            console.log(devInfo.smart_objects.gas[3].sensorValue);
+                            console.log('---------------------------------');
                             sensorS += '<tr><td><img src="dist/images/CO.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.gas[1].sensorValue + ' ppb </td></tr>';
                             sensorS += '<tr><td><img src="dist/images/SO2.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.gas[2].sensorValue + ' ppb </td></tr>';
                             sensorS += '<tr><td><img src="dist/images/NO2.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.gas[3].sensorValue + ' ppb </td></tr>';
-
+                            if (devInfo.smart_objects.gas[0].sensorValue && devInfo.smart_objects.gas[0].sensorValue !== 0) {
+                                $oxy_aqi.text(`waiting for new value`);
+                                sum[0] += Number(67);
+                            }
+                            if (devInfo.smart_objects.gas[0].sensorValue && devInfo.smart_objects.gas[1].sensorValue !== 0) {
+                                $co_aqi.text(`waiting for new value`);
+                                sum[1] += Number(123);
+                            }
+                            if (devInfo.smart_objects.gas[0].sensorValue && devInfo.smart_objects.gas[2].sensorValue !== 0) {
+                                $so2_aqi.text(`waiting for new value`);
+                                sum[2] += Number(6655);
+                            }
+                            if (devInfo.smart_objects.gas[0].sensorValue && devInfo.smart_objects.gas[3].sensorValue !== 0) {
+                                $no2_aqi.text(`waiting for new value`);
+                                sum[3] += Number(2222);
+                            }
                         }
 
 
@@ -540,6 +568,11 @@
                             $('#deviceTable tr:first').fadeTo(5, 0.4);
                         }
                     }
+                    console.log('HoanIsHere', sum);
+                    $oxy_aqi.text(`this is test: ${sum[0]}`);
+                    $co_aqi.text(`this is test: ${sum[1]}`);
+                    $so2_aqi.text(`this is test: ${sum[2]}`);
+                    $no2_aqi.text(`this is test: ${sum[3]}`);
                 }
 
 
