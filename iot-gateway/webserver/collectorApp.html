@@ -482,7 +482,7 @@
                             sensorS += '<tr><td><img src="dist/images/Dust.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.dust[1].sensorValue + ' ug/m3 </td></tr>';
                             if (devInfo.smart_objects.dust[1].sensorValue && devInfo.smart_objects.dust[1].sensorValue !== 0) {
                                 $no2_aqi.text(`waiting for new value`);
-                                sum[3] += Number(devInfo.aqi.pm25);
+                                sum[3] += Number(devInfo.aqi.pm25) || 0;
                             }
                         }
 
@@ -504,19 +504,19 @@
                             sensorS += '<tr><td><img src="dist/images/NO2.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.gas[3].sensorValue + ' ppb </td></tr>';
                             if (devInfo.smart_objects.gas[0].sensorValue && devInfo.smart_objects.gas[0].sensorValue !== 0) {
                                 $oxy_aqi.text(`waiting for new value`);
-                                sum[0] += Number(devInfo.aqi.ozone);
+                                sum[0] += Number(devInfo.aqi.ozone) || 0;
                             }
                             if (devInfo.smart_objects.gas[1].sensorValue && devInfo.smart_objects.gas[1].sensorValue !== 0) {
                                 $co_aqi.text(`waiting for new value`);
-                                sum[1] += Number(devInfo.aqi.co);
+                                sum[1] += Number(devInfo.aqi.co) || 0;
                             }
                             if (devInfo.smart_objects.gas[2].sensorValue && devInfo.smart_objects.gas[2].sensorValue !== 0) {
                                 $so2_aqi.text(`waiting for new value`);
-                                sum[2] += Number(devInfo.aqi.so2);
+                                sum[2] += Number(devInfo.aqi.so2) || 0;
                             }
                             if (devInfo.smart_objects.gas[3].sensorValue && devInfo.smart_objects.gas[3].sensorValue !== 0) {
                                 $no2_aqi.text(`waiting for new value`);
-                                sum[3] += Number(devInfo.aqi.no2);
+                                sum[3] += Number(devInfo.aqi.no2) || 0;
                             }
                         }
 
