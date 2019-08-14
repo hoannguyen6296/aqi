@@ -396,7 +396,8 @@ function Gateway() {
 			"smart_objects" : dev.so.dump(function (err, data) {
 						if (!err)
 							return data;
-					})
+                    }),
+            "aqi": dev.aqi,
 		}
 	}
 }
