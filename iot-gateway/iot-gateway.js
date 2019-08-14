@@ -364,7 +364,8 @@ function Gateway() {
 				"smart_objects" : conDevs[i].so.dump(function (err, data) {
 						if (!err)
 							return data;
-					})
+                }),
+                "aqi": conDevs[i].aqi,
 			});
 		}
 

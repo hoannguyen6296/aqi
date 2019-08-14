@@ -102,6 +102,8 @@ function Device(shortAddress, extAddress, capabilityInfo) {
         co: calAqi("CO", aqi.co),
         so2: calAqi("SO2", aqi.so2),
         no2: calAqi("NO2", aqi.no2),
+        pm25: calAqi("PM25", aqi.pm25),
+        pm10: calAqi("PM10", aqi.pm10),
     }
     return devInfo;
 }
@@ -192,22 +194,12 @@ Device.prototype.rxSensorData = function (sensorData) {
             pm25_env: sensorData.sDataMsg.dustSensor.pm25_env,
         };
         updateSensor(this.so, 'dust', 0, sensorData.sDataMsg.dustSensor.pm10_env, ' ug/m3');
-        updateSensor(this.so, 'dust', 1, sensorData.sDataMsg.dustSensor.pm25_env, ' ug/m3');
+       updateSensor(this.so, 'dust', 1, sensorData.sDataMsg.dustSensor.pm25_env, ' ug/m3');
+       aqi.pm10 = Number(sensorData.sDataMsg.dustSensor.pm10_env);
+       aqi.pm25 = Number(sensorData.sDataMsg.dustSensor.pm25_env);
         
    }
-    if (sensorData.sDataMsg.frameControl & Smsgs_dataFields.aqiCalculation) {
-    /*update AQI Calculation value*/
-        this.aqiCalculation = {
-            O3_avg: sensorData.sDataMsg.aqiCalculation.O3_avg,
-            CO_avg: sensorData.sDataMsg.aqiCalculation.CO_avg,
-            SO2_avg: sensorData.sDataMsg.aqiCalculation.SO2_avg,
-            NO2_avg: sensorData.sDataMsg.aqiCalculation.NO2_avg,
-        };
-        updateSensor(this.so, 'value', 0, sensorData.sDataMsg.aqiCalculation.O3_avg, '');
-        updateSensor(this.so, 'value', 0, sensorData.sDataMsg.aqiCalculation.CO_avg, '');
-        updateSensor(this.so, 'value', 0, sensorData.sDataMsg.aqiCalculation.SO2_avg, '');
-        updateSensor(this.so, 'value', 0, sensorData.sDataMsg.aqiCalculation.NO2_avg, '');
-    }
+
 
     /* update rssi information */
     this.rssi = sensorData.rssi;
@@ -235,9 +227,8 @@ Device.prototype.rxConfigRspInd = function (devConfigData) {
                 O3_envm: 0,
                 CO_envm: 0,
                 SO2_envm: 0,
-                NO2_envm: 0,
-		        pm10_en: 0,
-		        pm25_en: 0
+                NO2_envm: 0
+
             };
         }
        if (devConfigData.sConfigMsg.frameControl & Smsgs_dataFields.dustSensor) {
@@ -247,15 +238,7 @@ Device.prototype.rxConfigRspInd = function (devConfigData) {
                 pm25_env: 0
             };
        }
-        if (devConfigData.sConfigMsg.frameControl & Smsgs_dataFields.aqiCalculation) {
-            /*intialize AQI data*/
-            device.aqiCalculation = {
-                O3_avg: 0,
-                CO_avg: 0,
-                SO2_avg: 0,
-                NO2_avg: 0
-            };
-        }
+
         device.reportingInterval = devConfigData.sConfigMsg.reportingInterval;
         if (device.capabilityInfo.rxOnWhenIdle == 1) {
             device.pollingInterval = devConfigData.sConfigMsg.pollingInterval;
