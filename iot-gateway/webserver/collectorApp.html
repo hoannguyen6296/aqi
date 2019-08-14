@@ -481,8 +481,8 @@
                             sensorS += '<tr><td><img src="dist/images/Dust.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.dust[0].sensorValue + ' ug/m3 </td></tr>';
                             sensorS += '<tr><td><img src="dist/images/Dust.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.dust[1].sensorValue + ' ug/m3 </td></tr>';
                             if (devInfo.smart_objects.dust[1].sensorValue && devInfo.smart_objects.dust[1].sensorValue !== 0) {
-                                $no2_aqi.text(`waiting for new value`);
-                                sum[3] += Number(devInfo.aqi.pm25) || 0;
+                                $pm25_aqi.text(`waiting for new value`);
+                                sum[4] += Number(devInfo.aqi.pm25) || 0;
                             }
                         }
 
