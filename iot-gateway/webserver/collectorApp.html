@@ -423,7 +423,7 @@
                     let sum = [0, 0, 0, 0, 0];
                     for (count = 0; count < len; count++) {
                         var devInfo = connectedDeviceArray[count];
-                        console.log(devInfo);
+                        console.log('check cai cho nay',devInfo);
                         var sAddr;
                         var extAddr = "";
                         var capInfo;
@@ -482,7 +482,8 @@
                             sensorS += '<tr><td><img src="dist/images/Dust.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.dust[1].sensorValue + ' ug/m3 </td></tr>';
                             if (devInfo.smart_objects.dust[1].sensorValue && devInfo.smart_objects.dust[1].sensorValue !== 0) {
                                 $pm25_aqi.text(`waiting for new value`);
-                                sum[4] += Number(devInfo.aqi.pm25) || 0;
+                                let result = devInfo.aqi.pm25 || 0;
+                                sum[4] += result;
                             }
                         }
 
@@ -504,19 +505,23 @@
                             sensorS += '<tr><td><img src="dist/images/NO2.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.gas[3].sensorValue + ' ppb </td></tr>';
                             if (devInfo.smart_objects.gas[0].sensorValue && devInfo.smart_objects.gas[0].sensorValue !== 0) {
                                 $oxy_aqi.text(`waiting for new value`);
-                                sum[0] += Number(devInfo.aqi.ozone) || 0;
+                                let result = devInfo.aqi.ozone || 0
+                                sum[0] += result;
                             }
                             if (devInfo.smart_objects.gas[1].sensorValue && devInfo.smart_objects.gas[1].sensorValue !== 0) {
                                 $co_aqi.text(`waiting for new value`);
-                                sum[1] += Number(devInfo.aqi.co) || 0;
+                                let result = devInfo.aqi.co || 0;
+                                sum[1] += result;
                             }
                             if (devInfo.smart_objects.gas[2].sensorValue && devInfo.smart_objects.gas[2].sensorValue !== 0) {
                                 $so2_aqi.text(`waiting for new value`);
-                                sum[2] += Number(devInfo.aqi.so2) || 0;
+                                let result = devInfo.aqi.so2 || 0
+                                sum[2] += result;
                             }
                             if (devInfo.smart_objects.gas[3].sensorValue && devInfo.smart_objects.gas[3].sensorValue !== 0) {
                                 $no2_aqi.text(`waiting for new value`);
-                                sum[3] += Number(devInfo.aqi.no2) || 0;
+                                let result = devInfo.aqi.no2 || 0
+                                sum[3] += result;
                             }
                         }
 
