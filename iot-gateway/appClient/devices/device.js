@@ -69,6 +69,7 @@ var aqi = {
     co: 0,
     so2: 0,
     no2: 0,
+    pm25: 0,
 }
 /*!
  * @brief      Constructor for device objects
@@ -102,6 +103,7 @@ function Device(shortAddress, extAddress, capabilityInfo) {
         co: calAqi("CO", aqi.co),
         so2: calAqi("SO2", aqi.so2),
         no2: calAqi("NO2", aqi.no2),
+        pm25: calAqi("PM25", aqi.pm25),
     }
     return devInfo;
 }
@@ -193,7 +195,7 @@ Device.prototype.rxSensorData = function (sensorData) {
         };
         updateSensor(this.so, 'dust', 0, sensorData.sDataMsg.dustSensor.pm10_env, ' ug/m3');
         updateSensor(this.so, 'dust', 1, sensorData.sDataMsg.dustSensor.pm25_env, ' ug/m3');
-        
+        aqi.pm25 = Number(sensorData.sDataMsg.dustSensor.pm25_env);        
    }
     if (sensorData.sDataMsg.frameControl & Smsgs_dataFields.aqiCalculation) {
     /*update AQI Calculation value*/

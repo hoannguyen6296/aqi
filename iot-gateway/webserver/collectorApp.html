@@ -235,6 +235,7 @@
                 var $co_aqi = $('#co_aqi');
                 var $so2_aqi = $('#so2_aqi');
                 var $no2_aqi = $('#no2_api');
+                var $pm25_aqi = $('#pm25_aqi');
 
 
                 /* Request device list and newtork information on successful connection */
@@ -419,7 +420,7 @@
 
                     /* Draw Network */
                     collectorApp_drawNetwork(connectedDeviceArray);
-                    let sum = [0, 0, 0, 0];
+                    let sum = [0, 0, 0, 0, 0];
                     for (count = 0; count < len; count++) {
                         var devInfo = connectedDeviceArray[count];
                         console.log(devInfo);
@@ -479,6 +480,10 @@
                             sensorDataFound = 1;
                             sensorS += '<tr><td><img src="dist/images/Dust.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.dust[0].sensorValue + ' ug/m3 </td></tr>';
                             sensorS += '<tr><td><img src="dist/images/Dust.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.dust[1].sensorValue + ' ug/m3 </td></tr>';
+                            if (devInfo.smart_objects.dust[1].sensorValue && devInfo.smart_objects.dust[1].sensorValue !== 0) {
+                                $no2_aqi.text(`waiting for new value`);
+                                sum[3] += Number(devInfo.aqi.pm25);
+                            }
                         }
 
 
@@ -499,19 +504,19 @@
                             sensorS += '<tr><td><img src="dist/images/NO2.png " alt="some_text" height="30" width="30"></td><td>' + devInfo.smart_objects.gas[3].sensorValue + ' ppb </td></tr>';
                             if (devInfo.smart_objects.gas[0].sensorValue && devInfo.smart_objects.gas[0].sensorValue !== 0) {
                                 $oxy_aqi.text(`waiting for new value`);
-                                sum[0] += Number(67);
+                                sum[0] += Number(devInfo.aqi.ozone);
                             }
-                            if (devInfo.smart_objects.gas[0].sensorValue && devInfo.smart_objects.gas[1].sensorValue !== 0) {
+                            if (devInfo.smart_objects.gas[1].sensorValue && devInfo.smart_objects.gas[1].sensorValue !== 0) {
                                 $co_aqi.text(`waiting for new value`);
-                                sum[1] += Number(123);
+                                sum[1] += Number(devInfo.aqi.co);
                             }
-                            if (devInfo.smart_objects.gas[0].sensorValue && devInfo.smart_objects.gas[2].sensorValue !== 0) {
+                            if (devInfo.smart_objects.gas[2].sensorValue && devInfo.smart_objects.gas[2].sensorValue !== 0) {
                                 $so2_aqi.text(`waiting for new value`);
-                                sum[2] += Number(6655);
+                                sum[2] += Number(devInfo.aqi.so2);
                             }
-                            if (devInfo.smart_objects.gas[0].sensorValue && devInfo.smart_objects.gas[3].sensorValue !== 0) {
+                            if (devInfo.smart_objects.gas[3].sensorValue && devInfo.smart_objects.gas[3].sensorValue !== 0) {
                                 $no2_aqi.text(`waiting for new value`);
-                                sum[3] += Number(2222);
+                                sum[3] += Number(devInfo.aqi.no2);
                             }
                         }
 
@@ -573,6 +578,7 @@
                     $co_aqi.text(`this is test: ${sum[1]}`);
                     $so2_aqi.text(`this is test: ${sum[2]}`);
                     $no2_aqi.text(`this is test: ${sum[3]}`);
+                    $.$pm25_aqi.text(`this is test: ${sum[4]}`)
                 }
 
 
