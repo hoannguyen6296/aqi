@@ -518,7 +518,7 @@ function Appclient() {
         var deviceIdx = -1;
         var deviceData = {};
         deviceData.srcAddr = {};
-
+        deviceData.aqi = {};
         deviceData.srcAddr.addrMode = data.readUint8(ind);
         ind += 1;
 
