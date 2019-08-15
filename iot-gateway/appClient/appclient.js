@@ -54,6 +54,7 @@ var Device = require('./devices/device.js');
 var NwkInfo = require('./nwkinfo/nwkinfo.js');
 var ByteBuffer = require("bytebuffer");
 var Long = require("long");
+var aqibot = require('aqi-bot');
 
 
 /* *********************************************************************
@@ -564,6 +565,7 @@ function Appclient() {
                 deviceData.sDataMsg.dustSensor.pm10_env = data.readUint16(ind);
                 ind += 2;
                 deviceData.sDataMsg.dustSensor.pm25_env = data.readUint16(ind);
+                deviceData.aqi.pm25 = calAqi(data.readUint16(ind));
                 ind += 2;
 
             }
@@ -573,18 +575,17 @@ function Appclient() {
             if(deviceData.sDataMsg.frameControl & Smsgs_dataFields.lightSensor){
                 deviceData.sDataMsg.lightSensor = {};
                 deviceData.sDataMsg.lightSensor.O3_envm = data.readUint16(ind);
+                deviceData.aqi.ozone = calAqi(data.readUint16(ind));
                 ind += 2;
                 deviceData.sDataMsg.lightSensor.CO_envm = data.readUint16(ind);
+                deviceData.aqi.co = calAqi(data.readUint16(ind));
                 ind += 2;
                 deviceData.sDataMsg.lightSensor.SO2_envm = data.readUint16(ind);
+                deviceData.aqi.so2 = calAqi(data.readUint16(ind));
                 ind += 2;
                 deviceData.sDataMsg.lightSensor.NO2_envm = data.readUint16(ind);
+                deviceData.aqi.no2 = calAqi(data.readUint16(ind));
                 ind += 2;
-                deviceData.sDataMsg.lightSensor.pm10_en = data.readUint16(ind);
-                ind += 2;
-                deviceData.sDataMsg.lightSensor.pm25_en = data.readUint16(ind);
-                ind += 2;
-
             }
         /* AQI calculation data received */
             if (deviceData.sDataMsg.frameControl & Smsgs_dataFields.aqiCalculation) {
@@ -1083,6 +1084,16 @@ function Appclient() {
         appC_sendDevMovedIndToAppServer(data);
     }
 
+}
+
+function calAqi(type, avg) {
+    var aqi = 0;
+    aqibot.AQICalculator.getAQIResult(type, avg).then((res) => {
+        aqi = res;
+    }).catch(err => {
+        console.log(err);
+    })
+    return aqi;
 }
 
 Appclient.prototype.__proto__ = events.EventEmitter.prototype;
