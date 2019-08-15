@@ -182,7 +182,11 @@ Device.prototype.rxSensorData = function (sensorData) {
         updateSensor(this.so, 'gas', 2, sensorData.sDataMsg.lightSensor.SO2_envm, 'ppb');
         updateSensor(this.so, 'gas', 3, sensorData.sDataMsg.lightSensor.NO2_envm, 'ppb');
         aqi.ozone = Number(sensorData.sDataMsg.lightSensor.O3_envm);
+        this.aqi.ozone = calAqi(sensorData.sDataMsg.lightSensor.O3_envm);
         aqi.co = Number(sensorData.sDataMsg.lightSensor.CO_envm);
+        this.aqi.co = calAqi(sensorData.sDataMsg.lightSensor.CO_envm);
+        this.aqi.so2 = calAqi(sensorData.sDataMsg.lightSensor.SO2_envm);
+        this.aqi.no2 = calAqi(sensorData.sDataMsg.lightSensor.NO2_envm);
         aqi.so2 = Number(sensorData.sDataMsg.lightSensor.SO2_envm);
         aqi.no2 = Number(sensorData.sDataMsg.lightSensor.NO2_envm)
 
@@ -197,7 +201,8 @@ Device.prototype.rxSensorData = function (sensorData) {
        updateSensor(this.so, 'dust', 1, sensorData.sDataMsg.dustSensor.pm25_env, ' ug/m3');
        aqi.pm10 = Number(sensorData.sDataMsg.dustSensor.pm10_env);
        aqi.pm25 = Number(sensorData.sDataMsg.dustSensor.pm25_env);
-        
+        this.aqi.pm25 = calAqi(sensorData.sDataMsg.dustSensor.pm25_env);
+        this.aqi.pm10 = calAqi(sensorData.sDataMsg.dustSensor.pm10_env);
    }
 
 
