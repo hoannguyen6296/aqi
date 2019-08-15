@@ -81,13 +81,14 @@ var aqi = {
  */
 
 function calAqi(type, avg) {
-    var aqi = 0;
+    var anumber = 0;
     aqibot.AQICalculator.getAQIResult(type, avg).then((res) => {
-        aqi = res;
+        anumber = res;
     }).catch(err => {
         console.log(err);
+        return 0;
     })
-    return aqi;
+    return anumber;
 }
 
 function Device(shortAddress, extAddress, capabilityInfo) {
@@ -98,12 +99,11 @@ function Device(shortAddress, extAddress, capabilityInfo) {
     devInfo.active = 'true';
     devInfo.so = new SmartObject();
     devInfo.aqi = {
-        ozone: calAqi("O3", aqi.ozone),
-        co: calAqi("CO", aqi.co),
-        so2: calAqi("SO2", aqi.so2),
-        no2: calAqi("NO2", aqi.no2),
-        pm25: calAqi("PM25", aqi.pm25),
-        pm10: calAqi("PM10", aqi.pm10),
+        ozone: aqi.ozone,
+        co: aqi.co,
+        so2: aqi.so2,
+        no2: aqi.no2,
+        pm25: aqi.pm25,
     }
     return devInfo;
 }
@@ -217,6 +217,13 @@ Device.prototype.rxConfigRspInd = function (devConfigData) {
     var device = this;
     if (devConfigData.sConfigMsg.status == 0) {
         device.active = 'true';
+        device.aqi = {
+            ozone: 0,
+            co: 0,
+            so2: 0,
+            no2: 0,
+            pm25: 0,
+        }
 		/* Check the support sensor Types and add
 		information elements for those */
         if (devConfigData.sConfigMsg.frameControl & Smsgs_dataFields.tempSensor) {
@@ -233,7 +240,6 @@ Device.prototype.rxConfigRspInd = function (devConfigData) {
                 CO_envm: 0,
                 SO2_envm: 0,
                 NO2_envm: 0
-
             };
         }
        if (devConfigData.sConfigMsg.frameControl & Smsgs_dataFields.dustSensor) {

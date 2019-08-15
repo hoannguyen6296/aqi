@@ -1092,6 +1092,7 @@ function calAqi(type, avg) {
         aqi = res;
     }).catch(err => {
         console.log(err);
+        return 0;
     })
     return aqi;
 }
