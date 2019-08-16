@@ -63,13 +63,6 @@ var Smsgs_dataFields = Object.freeze({
     configSettings: 0x0010,
     dustSensor: 0x0800
 });
-
-var aqi = {
-    ozone: 0,
-    co: 0,
-    so2: 0,
-    no2: 0,
-}
 /*!
  * @brief      Constructor for device objects
  *
@@ -80,17 +73,6 @@ var aqi = {
  * @retun      device object
  */
 
-function calAqi(type, avg) {
-    var anumber = 0;
-    aqibot.AQICalculator.getAQIResult(type, avg).then((res) => {
-        anumber = res;
-    }).catch(err => {
-        console.log(err);
-        return 0;
-    })
-    return anumber;
-}
-
 function Device(shortAddress, extAddress, capabilityInfo) {
     var devInfo = this;
     devInfo.shortAddress = shortAddress;
@@ -98,13 +80,6 @@ function Device(shortAddress, extAddress, capabilityInfo) {
     devInfo.capabilityInfo = capabilityInfo;
     devInfo.active = 'true';
     devInfo.so = new SmartObject();
-    devInfo.aqi = {
-        ozone: aqi.ozone,
-        co: aqi.co,
-        so2: aqi.so2,
-        no2: aqi.no2,
-        pm25: aqi.pm25,
-    }
     return devInfo;
 }
 
@@ -155,7 +130,8 @@ function updateXYZSensor(so, type, instance, x, y, z, units) {
 
 /* Prototype Functions */
 Device.prototype.rxSensorData = function (sensorData) {
-    /* recieved message from the device, set as active */
+/* recieved message from the device, set as active */
+    console.log('aoushdousahd', sensorData);
     this.active = 'true';
 	/* Check the support sensor Types and
 	add information elements for those */
@@ -181,15 +157,6 @@ Device.prototype.rxSensorData = function (sensorData) {
         updateSensor(this.so, 'gas', 1, sensorData.sDataMsg.lightSensor.CO_envm, 'ppb');
         updateSensor(this.so, 'gas', 2, sensorData.sDataMsg.lightSensor.SO2_envm, 'ppb');
         updateSensor(this.so, 'gas', 3, sensorData.sDataMsg.lightSensor.NO2_envm, 'ppb');
-        aqi.ozone = Number(sensorData.sDataMsg.lightSensor.O3_envm);
-        this.aqi.ozone = calAqi(sensorData.sDataMsg.lightSensor.O3_envm);
-        aqi.co = Number(sensorData.sDataMsg.lightSensor.CO_envm);
-        this.aqi.co = calAqi(sensorData.sDataMsg.lightSensor.CO_envm);
-        this.aqi.so2 = calAqi(sensorData.sDataMsg.lightSensor.SO2_envm);
-        this.aqi.no2 = calAqi(sensorData.sDataMsg.lightSensor.NO2_envm);
-        aqi.so2 = Number(sensorData.sDataMsg.lightSensor.SO2_envm);
-        aqi.no2 = Number(sensorData.sDataMsg.lightSensor.NO2_envm)
-
     }
    if (sensorData.sDataMsg.frameControl & Smsgs_dataFields.dustSensor) {
         /* update the sensor values */
@@ -199,10 +166,6 @@ Device.prototype.rxSensorData = function (sensorData) {
         };
         updateSensor(this.so, 'dust', 0, sensorData.sDataMsg.dustSensor.pm10_env, ' ug/m3');
        updateSensor(this.so, 'dust', 1, sensorData.sDataMsg.dustSensor.pm25_env, ' ug/m3');
-       aqi.pm10 = Number(sensorData.sDataMsg.dustSensor.pm10_env);
-       aqi.pm25 = Number(sensorData.sDataMsg.dustSensor.pm25_env);
-        this.aqi.pm25 = calAqi(sensorData.sDataMsg.dustSensor.pm25_env);
-        this.aqi.pm10 = calAqi(sensorData.sDataMsg.dustSensor.pm10_env);
    }
 
 
@@ -217,13 +180,6 @@ Device.prototype.rxConfigRspInd = function (devConfigData) {
     var device = this;
     if (devConfigData.sConfigMsg.status == 0) {
         device.active = 'true';
-        device.aqi = {
-            ozone: 0,
-            co: 0,
-            so2: 0,
-            no2: 0,
-            pm25: 0,
-        }
 		/* Check the support sensor Types and add
 		information elements for those */
         if (devConfigData.sConfigMsg.frameControl & Smsgs_dataFields.tempSensor) {

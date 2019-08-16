@@ -48,7 +48,7 @@ var express = require('express');
 var events = require("events");
 var socket = require("socket.io")
 var http = require("http");
-
+var aqibot = require('aqi-bot');
 
 /* Webserver Instance */
 var webserverInstance;
@@ -120,9 +120,58 @@ function Webserver() {
 	webserverInstance.webserverSendToClient = function(msgType, data){
 				webserverInstance.io.sockets.emit(msgType, data);
 	};
-  webserverInstance.cloudAdapter_sendDeviceInfoMsg = function(data, extAddr){
-        webserverInstance.io.sockets.emit('connDevInfoUpdate', data);
-  };
+    webserverInstance.cloudAdapter_sendDeviceInfoMsg = async function (data, extAddr) {
+        let tempArray = [0, 0, 0, 0, 0];
+            if (data.smart_objects && data.smart_objects.gas) {
+                console.log('we are here');
+                temp = [data.smart_objects.gas['0'], data.smart_objects.gas['1'], data.smart_objects.gas['2'], data.smart_objects.gas['3']];// [03,co,so2,no2]replace with avg
+                for (const index in temp) {
+                    const gas = temp[index];
+                    console.log(gas.iid, gas.sensorValue);
+                    let type = '';
+                    if (gas.iid === 0) type += 'O3';
+                    if (gas.iid === 1) type += 'CO';
+                    if (gas.iid === 2) type += 'SO2';
+                    if (gas.iid === 3) type += 'NO2';
+                    if (gas.iid === 2 && temp[2] >= 1004) {
+                        tempArray[`2`] = 0;
+                    }
+                    try {
+                        const result = await aqibot.AQICalculator.getAQIResult(type, gas.sensorValue);
+                        tempArray[`${gas.iid}`] = result.aqi;
+                    }
+                    catch (err) {
+                        tempArray[`${gas.iid}`] = 0;
+                    }
+                    
+                }
+            }
+            if (data.smart_objects && data.smart_objects.dust) {
+                console.log('we are here');
+                temp = [data.smart_objects.dust['0'], data.smart_objects.dust['1']];//[pm10,pm25] replace with avg
+                for (const index in temp) {
+                    const gas = temp[index];
+                    console.log(gas.iid, gas.sensorValue);
+                    let type = '';
+                    if (dust.iid === 0) continue;
+                    if (dust.iid === 1) type += 'PM2.5';
+
+                    try {
+                        const result = await aqibot.AQICalculator.getAQIResult(type, gas.sensorValue);
+                        tempArray[`${gas.iid+3}`] = result.aqi;
+                    }
+                    catch (err) {
+                        tempArray[`${gas.iid+3}`] = 0;
+                    }
+                }
+            }
+            console.log('temp', tempArray);
+            let response = { ...data, aqi: tempArray };
+            console.log('newest newest', response);
+            webserverInstance.io.sockets.emit('connDevInfoUpdate', response);
+            console.log('webserver', data);
+    };
+
   webserverInstance.cloudAdapter_sendNetworkInfoMsg = function(data){
         webserverInstance.io.sockets.emit('nwkUpdate', data);
   };
