@@ -689,7 +689,6 @@
 
                 /* Rcvd connDevInfoUpdate message */
                 socket.on('connDevInfoUpdate', function (data) {
-                    console.log(data);
                     console.log('this is where we start');
                     collectorApp_updateNwkInfo(data);
                 });
