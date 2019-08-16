@@ -565,7 +565,7 @@ function Appclient() {
                 deviceData.sDataMsg.dustSensor.pm10_env = data.readUint16(ind);
                 ind += 2;
                 deviceData.sDataMsg.dustSensor.pm25_env = data.readUint16(ind);
-                deviceData.aqi.pm25 = calAqi(data.readUint16(ind));
+                deviceData.aqi.pm25 = 123;
                 ind += 2;
 
             }
@@ -575,16 +575,16 @@ function Appclient() {
             if(deviceData.sDataMsg.frameControl & Smsgs_dataFields.lightSensor){
                 deviceData.sDataMsg.lightSensor = {};
                 deviceData.sDataMsg.lightSensor.O3_envm = data.readUint16(ind);
-                deviceData.aqi.ozone = calAqi(data.readUint16(ind));
+                deviceData.aqi.ozone = 123;
                 ind += 2;
                 deviceData.sDataMsg.lightSensor.CO_envm = data.readUint16(ind);
-                deviceData.aqi.co = calAqi(data.readUint16(ind));
+                deviceData.aqi.co = 123;
                 ind += 2;
                 deviceData.sDataMsg.lightSensor.SO2_envm = data.readUint16(ind);
-                deviceData.aqi.so2 = calAqi(data.readUint16(ind));
+                deviceData.aqi.so2 = 123;
                 ind += 2;
                 deviceData.sDataMsg.lightSensor.NO2_envm = data.readUint16(ind);
-                deviceData.aqi.no2 = calAqi(data.readUint16(ind));
+                deviceData.aqi.no2 = 123;
                 ind += 2;
             }
         /* AQI calculation data received */
